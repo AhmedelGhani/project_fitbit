@@ -26,7 +26,7 @@ def plot_calories_per_day(df, user_id, start_date=None, end_date=None):
         start_date = datetime.strptime(start_date, "%Y-%m-%d")
         end_date = datetime.strptime(end_date, "%Y-%m-%d")
         user_data = user_data[(user_data['ActivityDate']>= start_date) & (user_data['ActivityDate']<= end_date)]
-    plt.figure(figsize=(10,5))
+    plt.figure(figsize=(9, 4))
     sns.lineplot(x='ActivityDate', y='Calories', data=user_data)
     plt.xlabel('Date')
     plt.ylabel('Calories burned')
