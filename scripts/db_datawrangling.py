@@ -4,10 +4,14 @@ import pandas as pd
 import numpy as np
 
 
-conn = sqlite3.connect('fitbit_database.db')
+connection = sqlite3.connect('fitbit_database.db')
 query = 'SELECT * FROM "weight_log";'
-df = pd.read_sql_query(query, conn)
-conn.close()
+cursor = connection.cursor()
+cursor.execute(query)
+rows = cursor.fetchall()
+df = pd.DataFrame(rows, columns=[x[0] for x in cursor.description])
+print(df)
+connection.close()
 
 print("Missing values before handling:")
 print(df.isnull().sum())
