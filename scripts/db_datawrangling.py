@@ -16,4 +16,8 @@ connection.close()
 print("Missing values before handling:")
 print(df.isnull().sum())
 
+df["WeightKg"] = df["WeightKg"].fillna(df["WeightPounds"] / 2.20462262185)
 
+print("Missing values after handling:")
+print(df.isnull().sum())
+print(df)
