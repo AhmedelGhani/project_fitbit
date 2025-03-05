@@ -1,6 +1,8 @@
 #Just to see if my branch works
 import sqlite3
 import pandas as pd
+pd.set_option('display.max_columns', None)  # Show all columns
+pd.set_option('display.width', 1000)  # Increase column width
 import numpy as np
 
 
