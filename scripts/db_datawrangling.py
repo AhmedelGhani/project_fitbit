@@ -24,3 +24,28 @@ df = df.drop(columns=['Fat'])
 print("Missing values after handling:")
 print(df.isnull().sum())
 print(df)
+
+def mergingtables(other_table, join_column='Id'):
+    connection = sqlite3.connect('fitbit_database.db')
+    cursor = connection.cursor()
+
+    query_weight = 'SELECT * FROM "weight_log";'
+    cursor.execute(query_weight)
+    weight_rows = cursor.fetchall()
+    weight_columns = [desc[0] for desc in cursor.description]
+    df_weight = pd.DataFrame(weight_rows, columns=weight_columns)
+    
+    query_other = f'SELECT * FROM "{other_table}";'
+    cursor.execute(query_other)
+    other_rows = cursor.fetchall()
+    other_columns = [desc[0] for desc in cursor.description]
+    df_other = pd.DataFrame(other_rows, columns=other_columns)
+
+    connection.close()
+    
+    merged_df = pd.merge(df_weight, df_other, on=join_column, how='inner')
+    
+    return merged_df
+
+merged_data = mergingtables('daily_activity')
+print(merged_data.head())
