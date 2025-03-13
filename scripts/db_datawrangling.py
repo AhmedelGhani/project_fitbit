@@ -1,4 +1,3 @@
-#Just to see if my branch works
 import sqlite3
 import pandas as pd
 import numpy as np
@@ -28,7 +27,7 @@ def mergingtables(table1, table2, join_column='Id'):
     connection = sqlite3.connect('fitbit_database.db')
     cursor = connection.cursor()
 
-    query_weight = 'SELECT * FROM "{table1}";'
+    query_weight = f'SELECT * FROM "{table1}";'
     cursor.execute(query_weight)
     weight_rows = cursor.fetchall()
     weight_columns = [desc[0] for desc in cursor.description]
