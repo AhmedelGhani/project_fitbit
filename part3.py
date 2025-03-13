@@ -2,6 +2,8 @@ import sqlite3
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import scipy.stats as stats
 
 # Part 3.1: Compute sleep duration per logId for each individual
 connection = sqlite3.connect('fitbit_database.db')
@@ -44,15 +46,43 @@ activity['ActivityDate'] = pd.to_datetime(activity['ActivityDate'])
 mergedActivitySleep = pd.merge(activity, sleepPerDay, left_on=['Id', 'ActivityDate'], right_on=['Id', 'date'], how='inner')
 mergedActivitySleep['TotalActiveMinutes'] = mergedActivitySleep['VeryActiveMinutes'] + mergedActivitySleep['FairlyActiveMinutes'] + mergedActivitySleep['LightlyActiveMinutes']
 
-x = mergedActivitySleep['TotalActiveMinutes']
-y = mergedActivitySleep['SleepMinutes']
-x = sm.add_constant(x)
-model = sm.OLS(y, x).fit()
-print(model.summary())
+xActivity = mergedActivitySleep['TotalActiveMinutes']
+ySleep = mergedActivitySleep['SleepMinutes']
+xActivity = sm.add_constant(xActivity)
+modelActivity = sm.OLS(ySleep, xActivity).fit()
+print(modelActivity.summary())
 
 
 # Part 3.3: Sleep duration compared to sedentary activity with regression and verification for normality
+xSedentary = mergedActivitySleep['SedentaryMinutes']
+xSedentary = sm.add_constant(xSedentary)
+modelSedentary = sm.OLS(ySleep, xSedentary).fit()
+print(modelSedentary.summary())
+residualsSedentary = modelSedentary.resid
 
+binsMain = np.linspace(-0.05, 0.01, 30)
+binsOutlier = np.linspace(0.95, 1.05, 5)
+fig, (axis1, axis2) = plt.subplots(1, 2, sharey=True, figsize=(9, 5), gridspec_kw={'width_ratios': [6, 1]})
+axis1.hist(residualsSedentary, bins=binsMain, edgecolor='black')
+axis1.set_xlim(-0.05, 0.01)
+axis1.set_xlabel('Residual main')
+axis1.set_ylabel('Frequency')
+axis1.set_title('Main range for histogram of residuals')
+axis2.hist(residualsSedentary, bins=binsOutlier, edgecolor='black')
+axis2.set_xlim(0.9, 1.1)
+axis2.set_xlabel('Residual outlier')
+axis2.set_title('Outlier range')
+axis1.spines['right'].set_visible(False)
+axis2.spines['left'].set_visible(False)
+axis1.tick_params(right=False)
+axis2.tick_params(left=False)
+plt.tight_layout()
+plt.savefig('part3ResidualsHistogramSedentary.png')
+
+plt.figure()
+stats.probplot(residualsSedentary, dist="norm", plot=plt)
+plt.title('Q-Q plot of residuals, Sedentary minutes against Sleep minutes)')
+plt.savefig('part3ResidualsQQplotSedentary.png')
 
 
 # Part 3.4: Average steps, calories burned, and minutes of sleep per 4 hour time blocks
