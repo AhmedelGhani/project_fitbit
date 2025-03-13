@@ -48,12 +48,18 @@ def mergingtables(table1, table2, join_column='Id'):
 merged_data = mergingtables('weight_log', 'hourly_steps')
 print(merged_data)
 
-def numeric_summary (df):
-    exclude = ['Id', 'LogId', 'Date']
-    columns = df.select_dtypes(include=[np.number]).columns.tolist()
-    columns = [col for col in columns if col not in exclude]
-    grouped_stats = df.groupby(['Id'])[columns].agg(['mean', 'std', 'min', 'max', 'count'])
+def numeric_summary(df, columns=None):
+    if columns is None:
+        exclude = ['Id', 'LogId', 'Date', 'IsManualReport', 'ActivityHour']
+        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+        columns = [col for col in numeric_cols if col not in exclude]
+    else:
+        if not isinstance(columns, list):
+            columns = [columns]
+        columns = [col for col in columns if col in df.columns]
+    
+    grouped_stats = df.groupby('Id')[columns].agg(['median', 'std', 'min', 'max', 'count'])
     return grouped_stats
 
-numeric_summary = numeric_summary (merged_data)
+numeric_summary = numeric_summary (merged_data, 'StepTotal')
 print (numeric_summary)
