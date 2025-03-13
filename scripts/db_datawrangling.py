@@ -1,9 +1,8 @@
 #Just to see if my branch works
 import sqlite3
 import pandas as pd
-pd.set_option('display.max_columns', None)  # Show all columns
-pd.set_option('display.width', 1000)  # Increase column width
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 connection = sqlite3.connect('fitbit_database.db')
@@ -25,17 +24,17 @@ print("Missing values after handling:")
 print(df.isnull().sum())
 print(df)
 
-def mergingtables(other_table, join_column='Id'):
+def mergingtables(table1, table2, join_column='Id'):
     connection = sqlite3.connect('fitbit_database.db')
     cursor = connection.cursor()
 
-    query_weight = 'SELECT * FROM "weight_log";'
+    query_weight = 'SELECT * FROM "{table1}";'
     cursor.execute(query_weight)
     weight_rows = cursor.fetchall()
     weight_columns = [desc[0] for desc in cursor.description]
     df_weight = pd.DataFrame(weight_rows, columns=weight_columns)
     
-    query_other = f'SELECT * FROM "{other_table}";'
+    query_other = f'SELECT * FROM "{table2}";'
     cursor.execute(query_other)
     other_rows = cursor.fetchall()
     other_columns = [desc[0] for desc in cursor.description]
@@ -47,5 +46,5 @@ def mergingtables(other_table, join_column='Id'):
     
     return merged_df
 
-merged_data = mergingtables('daily_activity')
+merged_data = mergingtables('weight_log', 'hourly_calories')
 print(merged_data.head())
