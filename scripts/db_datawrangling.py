@@ -12,7 +12,7 @@ df = pd.DataFrame(rows, columns=[x[0] for x in cursor.description])
 #print(df)
 connection.close()
 
-print("Missing values before handling:")
+#print("Missing values before handling:")
 #print(df.isnull().sum())
 
 df["WeightKg"] = df["WeightKg"].fillna(df["WeightPounds"] / 2.20462262185)
@@ -47,15 +47,22 @@ def mergingtables(table1, table2, join_column='Id'):
 merged_data = mergingtables('weight_log', 'hourly_steps')
 print(merged_data)
 
-def numeric_summary(df, columns=None, start_date = None, end_date = None):
+def numeric_summary(df, columns=None, start_date = None, end_date = None, start_time = None, end_time = None):
     if 'Date' in df.columns:
-        df['Date'] = pd.to_datetime(df['Date'], infer_datetime_format = True)
+        df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %I:%M:%S %p')
         if start_date is not None:
-            start_date = pd.to_datetime(start_date)
+            start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
             df = df[df['Date'] >= start_date]
         if end_date is not None:
-            start_date = pd.to_datetime(end_date)
+            end_date = pd.to_datetime(end_date, format = '%m/%d/%Y')
             df = df[df['Date'] <= end_date]
+    
+    if start_time is not None:
+        start_time = pd.to_datetime(start_time, format = '%I:%M:%S %p').time()
+        df = df[df['Date'].dt.time >= start_time]
+    if end_time is not None:
+        end_time = pd.to_datetime(end_time, format = '%I:%M:%S %p').time()
+        df = df[df['Date'].dt.time <= end_time]
     
     if columns is None:
         exclude = ['Id', 'LogId', 'IsManualReport', 'ActivityHour']
@@ -66,9 +73,26 @@ def numeric_summary(df, columns=None, start_date = None, end_date = None):
             columns = [columns]
         columns = [col for col in columns if col in df.columns]
     
-    print("Rows after date filter:", len(df))
+    print("Rows after time filter:", len(df))
     grouped_stats = df.groupby('Id')[columns].agg(['median', 'std', 'min', 'max', 'count'])
     return grouped_stats
 
-numeric_summary = numeric_summary (merged_data, 'StepTotal', '4/6/2016', '4/7/2016')
+temp = merged_data.copy()
+
+# Ensure "Date" is a proper datetime
+temp['Date'] = pd.to_datetime(temp['Date'], infer_datetime_format=True)
+
+# Filter for times >= 06:00:00
+start_t = pd.to_datetime('6:00:00 AM', format='%I:%M:%S %p').time()
+temp = temp[temp['Date'].dt.time >= start_t]
+
+# Filter for times <= 10:00:00
+end_t = pd.to_datetime('10:00:00 AM', format='%I:%M:%S %p').time()
+temp = temp[temp['Date'].dt.time <= end_t]
+
+print("Rows after time-of-day filter:", len(temp))
+print(temp[['Id', 'Date', 'StepTotal']])
+
+
+numeric_summary = numeric_summary (merged_data, 'StepTotal', None, None, '6:00:00 AM', '10:00:00 AM')
 print (numeric_summary)
