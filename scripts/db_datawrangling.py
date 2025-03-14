@@ -45,9 +45,11 @@ def mergingtables(table1, table2, join_column='Id'):
     return merged_df
 
 merged_data = mergingtables('weight_log', 'hourly_steps')
+pd.set_option('display.float_format', '{:.0f}'.format)
 print(merged_data)
 
-def numeric_summary(df, columns=None, start_date = None, end_date = None, start_time = None, end_time = None):
+def numeric_summary(df, ids = None, columns=None, start_date = None, 
+                    end_date = None, start_time = None, end_time = None):
     if 'Date' in df.columns:
         df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %I:%M:%S %p')
         if start_date is not None:
@@ -64,6 +66,11 @@ def numeric_summary(df, columns=None, start_date = None, end_date = None, start_
         end_time = pd.to_datetime(end_time, format = '%I:%M:%S %p').time()
         df = df[df['Date'].dt.time <= end_time]
     
+    if ids is not None:
+        if not isinstance (ids,list):
+            ids = [ids]
+        df = df[df['Id'].isin(ids)]
+
     if columns is None:
         exclude = ['Id', 'LogId', 'IsManualReport', 'ActivityHour']
         numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
@@ -79,5 +86,20 @@ def numeric_summary(df, columns=None, start_date = None, end_date = None, start_
 
 temp = merged_data.copy()
 
-numeric_summary = numeric_summary (merged_data, 'StepTotal', None, None, '6:00:00 AM', '10:00:00 AM')
+#Ensure "Date" is a proper datetime
+temp['Date'] = pd.to_datetime(temp['Date'], infer_datetime_format=True)
+
+# Filter for times >= 06:00:00
+start_t = pd.to_datetime('6:00:00 AM', format='%I:%M:%S %p').time()
+temp = temp[temp['Date'].dt.time >= start_t]
+
+# Filter for times <= 10:00:00
+end_t = pd.to_datetime('10:00:00 AM', format='%I:%M:%S %p').time()
+temp = temp[temp['Date'].dt.time <= end_t]
+
+print("Rows after time-of-day filter:", len(temp))
+print(temp[['Id', 'Date', 'StepTotal']])
+
+
+numeric_summary = numeric_summary (merged_data, 8877689391, 'StepTotal', None, None, '6:00:00 AM', '10:00:00 AM')
 print (numeric_summary)
