@@ -44,10 +44,11 @@ def mergingtables(table1, table2, join_column='Id'):
     
     return merged_df
 
-merged_data = mergingtables('weight_log', 'hourly_steps')
+merged_data = mergingtables('weight_log', 'daily_activity')
 pd.set_option('display.float_format', '{:.0f}'.format)
 print(merged_data)
 
+#Add another column to compare
 def numeric_summary(df, ids = None, columns=None, start_date = None, 
                     end_date = None, start_time = None, end_time = None):
     if 'Date' in df.columns:
@@ -80,18 +81,21 @@ def numeric_summary(df, ids = None, columns=None, start_date = None,
             columns = [columns]
         columns = [col for col in columns if col in df.columns]
     
-    def iqr(series):
+    def IQR(series):
         return series.quantile(0.75) - series.quantile(0.25)
 
-    def q1(series):
+    def Q1(series):
         return series.quantile(0.25)
 
-    def q3(series):
+    def Q3(series):
         return series.quantile(0.75)
 
     print("Rows after time filter:", len(df))
-    grouped_stats = df.groupby('Id')[columns].agg(['mean', 'std', 'min', q1, 'median', q3, 'max', iqr, 'count'])
+    grouped_stats = df.groupby('Id')[columns].agg(['mean', 'std', 'min', Q1, 'median', Q3, 'max', IQR, 'count'])
     return grouped_stats
+
+
+#Boxplot, scatterplot, over-time plot
 
 temp = merged_data.copy()
 
@@ -110,5 +114,5 @@ temp = temp[temp['Date'].dt.time <= end_t]
 #print(temp[['Id', 'Date', 'StepTotal']])
 
 
-numeric_summary = numeric_summary (merged_data, None, 'StepTotal', None, None, None, None)
+numeric_summary = numeric_summary (merged_data, None, 'Calories', None, None, None, None)
 print (numeric_summary)
