@@ -4,6 +4,8 @@ import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import scipy.stats as stats
+import matplotlib.dates as mdates
+
 
 # Part 3.1: Compute sleep duration per logId for each individual
 connection = sqlite3.connect('fitbit_database.db')
@@ -88,7 +90,7 @@ plt.savefig('part3ResidualsQQplot.png')
 # Part 3.4: Average steps, calories burnt, and minutes of sleep per 4 hour time blocks
 querySteps = 'SELECT * FROM "hourly_steps";'
 cursor.execute(querySteps)
-rows = cursor.fetchall()
+rows = cursor.fetchall() 
 steps = pd.DataFrame(rows, columns=[x[0] for x in cursor.description])
 steps['Hour'] = pd.to_datetime(steps['ActivityHour']).dt.hour
 steps['Block'] = pd.cut(steps['Hour'], bins=[0,4,8,12,16,20,24], labels=['0 – 4','4 – 8','8 – 12','12 – 16','16 – 20','20 – 24'], right=False)
@@ -124,8 +126,70 @@ plt.tight_layout()
 plt.savefig('part3Averages.png')
 
 
-# Part 3.5: Heart rate and total intensity plot for given Id
+# Part 3.5: Heart rate and total intensity plot for a random Id, graphed for two consecutive days
+queryHeart = 'SELECT * FROM "heart_rate";'
+cursor.execute(queryHeart)
+rows = cursor.fetchall() 
+heart = pd.DataFrame(rows, columns=[x[0] for x in cursor.description])
+heart['Datetime'] = pd.to_datetime(heart['Time'])
 
+queryIntensity = 'SELECT * FROM "hourly_intensity";'
+cursor.execute(queryIntensity)
+rows = cursor.fetchall()
+intensity = pd.DataFrame(rows, columns=[x[0] for x in cursor.description])
+intensity['Datetime'] = pd.to_datetime(intensity['ActivityHour'])
+
+uniqueIds = heart['Id'].unique()
+np.random.shuffle(uniqueIds)
+success = False
+
+for selectedId in uniqueIds:
+    heartId = heart[heart['Id'] == selectedId].copy()
+    heartId['Date'] = heartId['Datetime'].dt.date
+    intensityId = intensity[intensity['Id'] == selectedId].copy()
+    intensityId['Date'] = intensityId['Datetime'].dt.date
+    validDates = []
+
+    for date in heartId['Date'].unique():
+        nextDay = date + pd.Timedelta(days=1)
+        heartDay1 = heartId[heartId['Date'] == date]
+        heartDay2 = heartId[heartId['Date'] == nextDay]
+        intensityDay1 = intensityId[intensityId['Date'] == date]
+        intensityDay2 = intensityId[intensityId['Date'] == nextDay]
+
+        if (heartDay1['Datetime'].dt.hour.nunique() >= 24 and
+            heartDay2['Datetime'].dt.hour.nunique() >= 24 and
+            intensityDay1['Datetime'].dt.hour.nunique() >= 24 and
+            intensityDay2['Datetime'].dt.hour.nunique() >= 24):
+            validDates.append(date)
+
+    if len(validDates) > 0:
+        date = np.random.choice(validDates)
+        nextDate = date + pd.Timedelta(days=1)
+        heart2Days = heartId[(heartId['Date'] == date) | (heartId['Date'] == nextDate)].copy()
+        heart2Days60MinInterval = heart2Days.set_index('Datetime')['Value'].resample('60min').mean().reset_index()
+        intensity2Days = intensityId[(intensityId['Date'] == date) | (intensityId['Date'] == nextDate)].copy()
+
+        fig, axis1Q5 = plt.subplots(figsize=(14, 5))
+        axis1Q5.plot(heart2Days60MinInterval['Datetime'], heart2Days60MinInterval['Value'], label='Heart rate', color='red')
+        axis1Q5.set_xlabel('Time')
+        axis1Q5.set_ylabel('Heart Rate', color='red')
+        axis1Q5.tick_params(axis='y', labelcolor='red')
+        date_format = mdates.DateFormatter('%H:%M (%m-%d)')
+        axis1Q5.xaxis.set_major_formatter(date_format)
+        plt.xticks(rotation=45)
+        axis2Q5 = axis1Q5.twinx()
+        axis2Q5.plot(intensity2Days['Datetime'], intensity2Days['TotalIntensity'], label='Total intensity', color='blue', marker='o')
+        axis2Q5.set_ylabel('Total intensity', color='blue')
+        axis2Q5.tick_params(axis='y', labelcolor='blue')
+        plt.title(f'Heart rate and total intensity for Id {selectedId} on {date} and {nextDate}')
+        plt.tight_layout()
+        plt.savefig('part3HeartRateAndIntensity.png')
+        success = True
+        break
+
+if not success:
+    print("No valid Id found with 2 full consecutive days of data")
 
 
 # Part 3.6: Weather data analysis for Chicago
