@@ -79,20 +79,5 @@ def numeric_summary(df, columns=None, start_date = None, end_date = None, start_
 
 temp = merged_data.copy()
 
-# Ensure "Date" is a proper datetime
-temp['Date'] = pd.to_datetime(temp['Date'], infer_datetime_format=True)
-
-# Filter for times >= 06:00:00
-start_t = pd.to_datetime('6:00:00 AM', format='%I:%M:%S %p').time()
-temp = temp[temp['Date'].dt.time >= start_t]
-
-# Filter for times <= 10:00:00
-end_t = pd.to_datetime('10:00:00 AM', format='%I:%M:%S %p').time()
-temp = temp[temp['Date'].dt.time <= end_t]
-
-print("Rows after time-of-day filter:", len(temp))
-print(temp[['Id', 'Date', 'StepTotal']])
-
-
 numeric_summary = numeric_summary (merged_data, 'StepTotal', None, None, '6:00:00 AM', '10:00:00 AM')
 print (numeric_summary)
