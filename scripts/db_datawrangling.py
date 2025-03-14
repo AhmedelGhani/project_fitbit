@@ -80,14 +80,23 @@ def numeric_summary(df, ids = None, columns=None, start_date = None,
             columns = [columns]
         columns = [col for col in columns if col in df.columns]
     
+    def iqr(series):
+        return series.quantile(0.75) - series.quantile(0.25)
+
+    def q1(series):
+        return series.quantile(0.25)
+
+    def q3(series):
+        return series.quantile(0.75)
+
     print("Rows after time filter:", len(df))
-    grouped_stats = df.groupby('Id')[columns].agg(['median', 'std', 'min', 'max', 'count'])
+    grouped_stats = df.groupby('Id')[columns].agg(['mean', 'std', 'min', q1, 'median', q3, 'max', iqr, 'count'])
     return grouped_stats
 
 temp = merged_data.copy()
 
 #Ensure "Date" is a proper datetime
-temp['Date'] = pd.to_datetime(temp['Date'], infer_datetime_format=True)
+temp['Date'] = pd.to_datetime(temp['Date'])
 
 # Filter for times >= 06:00:00
 start_t = pd.to_datetime('6:00:00 AM', format='%I:%M:%S %p').time()
@@ -97,9 +106,9 @@ temp = temp[temp['Date'].dt.time >= start_t]
 end_t = pd.to_datetime('10:00:00 AM', format='%I:%M:%S %p').time()
 temp = temp[temp['Date'].dt.time <= end_t]
 
-print("Rows after time-of-day filter:", len(temp))
-print(temp[['Id', 'Date', 'StepTotal']])
+#print("Rows after time-of-day filter:", len(temp))
+#print(temp[['Id', 'Date', 'StepTotal']])
 
 
-numeric_summary = numeric_summary (merged_data, 8877689391, 'StepTotal', None, None, '6:00:00 AM', '10:00:00 AM')
+numeric_summary = numeric_summary (merged_data, None, 'StepTotal', None, None, None, None)
 print (numeric_summary)
