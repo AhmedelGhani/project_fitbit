@@ -2,6 +2,7 @@ import sqlite3
 from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
+from scipy.stats import linregress
 
 
 connection = sqlite3.connect('fitbit_database.db')
@@ -123,11 +124,23 @@ def scatter_plot(df, xcol, ycol, ids= None, start_date = None, end_date = None, 
     aggregated = df.groupby('Id')[[xcol, ycol]].median().reset_index()  
     print("Number of individuals after filtering:", len(aggregated))
 
+    regression = linregress(aggregated[xcol], aggregated[ycol])
+    slope = regression.slope
+    intercept = regression.intercept
+    r_value = regression.rvalue
+    r_squared = r_value ** 2
+
     plt.figure(figsize=(8, 6))
     plt.scatter(aggregated[xcol], aggregated[ycol], alpha=0.6, edgecolor='k')
     plt.xlabel(xcol)
     plt.ylabel(ycol)
     plt.title(f"Scatter Plot of {ycol} vs. {xcol}")
+
+    x_values = np.linspace(aggregated[xcol].min(), aggregated[xcol].max(), 100)
+    y_values = intercept + slope * x_values
+    plt.plot(x_values, y_values, color='red', label=f"Trendline (R² = {r_squared:.2f})")
+
+    plt.legend()
     plt.grid(True)
     plt.show()
 #Boxplot, scatterplot, over-time plot
@@ -149,6 +162,7 @@ def scatter_plot(df, xcol, ycol, ids= None, start_date = None, end_date = None, 
 #print(temp[['Id', 'Date', 'StepTotal']])
 
 print (merged_data.columns)
-numeric_summary = numeric_summary (merged_data, None, ['VeryActiveMinutes', 'SedentaryMinutes'], None, None, None, None)
+merged_data['ActiveMinutes'] = merged_data['VeryActiveMinutes'] + merged_data['FairlyActiveMinutes'] + merged_data['LightlyActiveMinutes']
+numeric_summary = numeric_summary (merged_data, None, ['ActiveMinutes', 'SedentaryMinutes'], None, None, None, None)
 print (numeric_summary)
-scatter_plot(merged_data, 'SedentaryMinutes', 'TotalSteps', None, None, None, None, None)
+scatter_plot(merged_data, 'SedentaryMinutes', 'ActiveMinutes', None, None, None, None, None)
