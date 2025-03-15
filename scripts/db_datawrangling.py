@@ -1,4 +1,5 @@
 import sqlite3
+from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 
@@ -44,13 +45,14 @@ def mergingtables(table1, table2, join_column='Id'):
     
     return merged_df
 
-merged_data = mergingtables('weight_log', 'daily_activity')
+merged_data = mergingtables('minute_sleep', 'daily_activity')
 pd.set_option('display.float_format', '{:.0f}'.format)
 print(merged_data)
 
 #Add another column to compare
 def numeric_summary(df, ids = None, columns=None, start_date = None, 
                     end_date = None, start_time = None, end_time = None):
+    df.rename(columns={'date': 'Date'}, inplace=True)
     if 'Date' in df.columns:
         df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %I:%M:%S %p')
         if start_date is not None:
@@ -94,25 +96,56 @@ def numeric_summary(df, ids = None, columns=None, start_date = None,
     grouped_stats = df.groupby('Id')[columns].agg(['mean', 'std', 'min', Q1, 'median', Q3, 'max', IQR, 'count'])
     return grouped_stats
 
+def scatter_plot(df, xcol, ycol, ids= None, start_date = None, end_date = None, start_time = None, end_time = None):
+    df.rename(columns={'date': 'Date'}, inplace=True)
 
+    if 'Date' in df.columns:
+        df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %I:%M:%S %p')
+        if start_date is not None:
+            start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
+            df = df[df['Date'] >= start_date]
+        if end_date is not None:
+            end_date = pd.to_datetime(end_date, format = '%m/%d/%Y')
+            df = df[df['Date'] <= end_date]
+    
+    if start_time is not None:
+        start_time = pd.to_datetime(start_time, format = '%I:%M:%S %p').time()
+        df = df[df['Date'].dt.time >= start_time]
+    if end_time is not None:
+        end_time = pd.to_datetime(end_time, format = '%I:%M:%S %p').time()
+        df = df[df['Date'].dt.time <= end_time]
+    
+    if ids is not None:
+        if not isinstance (ids,list):
+            ids = [ids]
+        df = df[df['Id'].isin(ids)]
+    
+    plt.figure(figsize=(8, 6))
+    plt.scatter(df[xcol], df[ycol], alpha=0.6, edgecolor='k')
+    plt.xlabel(xcol)
+    plt.ylabel(ycol)
+    plt.title(f"Scatter Plot of {ycol} vs. {xcol}")
+    plt.grid(True)
+    plt.show()
 #Boxplot, scatterplot, over-time plot
 
-temp = merged_data.copy()
+#temp = merged_data.copy()
 
 #Ensure "Date" is a proper datetime
-temp['Date'] = pd.to_datetime(temp['Date'])
+#temp['Date'] = pd.to_datetime(temp['Date'])
 
 # Filter for times >= 06:00:00
-start_t = pd.to_datetime('6:00:00 AM', format='%I:%M:%S %p').time()
-temp = temp[temp['Date'].dt.time >= start_t]
+#start_t = pd.to_datetime('6:00:00 AM', format='%I:%M:%S %p').time()
+#temp = temp[temp['Date'].dt.time >= start_t]
 
 # Filter for times <= 10:00:00
-end_t = pd.to_datetime('10:00:00 AM', format='%I:%M:%S %p').time()
-temp = temp[temp['Date'].dt.time <= end_t]
+#end_t = pd.to_datetime('10:00:00 AM', format='%I:%M:%S %p').time()
+#temp = temp[temp['Date'].dt.time <= end_t]
 
 #print("Rows after time-of-day filter:", len(temp))
 #print(temp[['Id', 'Date', 'StepTotal']])
 
-
-numeric_summary = numeric_summary (merged_data, None, 'Calories', None, None, None, None)
+print (merged_data.columns)
+numeric_summary = numeric_summary (merged_data, None, ['VeryActiveMinutes', 'SedentaryMinutes'], None, None, None, None)
 print (numeric_summary)
+scatter_plot(merged_data, 'VeryActiveMinutes', 'SedentaryMinutes', None, None, None, None, None)
