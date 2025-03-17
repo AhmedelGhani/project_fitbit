@@ -190,7 +190,7 @@ def box_plot (df, ids = None, columns = None, start_date = None, end_date = None
     plt.tight_layout()
     plt.show()
 
-def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, start_time=None, end_time=None):
+def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, start_time=None, end_time=None, time_intervals = None):
     df.rename(columns={'date': 'Date'}, inplace=True)
     if 'Date' in df.columns:
         df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %I:%M:%S %p')
@@ -213,6 +213,13 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
             ids = [ids]
         df = df[df['Id'].isin(ids)]
     
+    if time_intervals is not None:
+        df_copy = df.copy()
+        df_copy.set_index('Date', inplace=True)       
+        df_copy = df_copy.groupby('Id').resample(time_intervals)[[col1, col2]].mean()
+        df_copy.reset_index(inplace=True)
+        df = df_copy
+
     unique_ids = df['Id'].unique()
     n_ids = len(unique_ids)
     fig, axes = plt.subplots(n_ids, 1, figsize=(12, 5 * n_ids), sharex=True)
@@ -222,8 +229,9 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
     
     for ax, uid in zip(axes, unique_ids):
         df_uid = df[df['Id'] == uid].sort_values(by='Date')
-        ax.plot(df_uid['Date'], df_uid[col1], label=col1, marker='o')
-        ax.plot(df_uid['Date'], df_uid[col2], label=col2, marker='s')
+        df_uid.interpolate(inplace=True)
+        ax.plot(df_uid['Date'], df_uid[col1], label=col1)
+        ax.plot(df_uid['Date'], df_uid[col2], label=col2)
         ax.set_title(f"Time Series for Id {uid}")
         ax.set_xlabel("Time")
         ax.set_ylabel("Value")
@@ -231,29 +239,14 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
     
     plt.tight_layout()
     plt.show()
-    
-#Boxplot, scatterplot, over-time plot
 
-#temp = merged_data.copy()
 
-#Ensure "Date" is a proper datetime
-#temp['Date'] = pd.to_datetime(temp['Date'])
 
-# Filter for times >= 06:00:00
-#start_t = pd.to_datetime('6:00:00 AM', format='%I:%M:%S %p').time()
-#temp = temp[temp['Date'].dt.time >= start_t]
 
-# Filter for times <= 10:00:00
-#end_t = pd.to_datetime('10:00:00 AM', format='%I:%M:%S %p').time()
-#temp = temp[temp['Date'].dt.time <= end_t]
-
-#print("Rows after time-of-day filter:", len(temp))
-#print(temp[['Id', 'Date', 'StepTotal']])
-
-print(merged_data.columns)
 merged_data['ActiveMinutes'] = merged_data['VeryActiveMinutes'] + merged_data['FairlyActiveMinutes'] + merged_data['LightlyActiveMinutes']
+print(merged_data.columns)
 numeric_summary = numeric_summary (merged_data, None, ['ActiveMinutes', 'SedentaryMinutes'], None, None, None, None)
 print (numeric_summary)
-scatter_plot(merged_data, 'SedentaryMinutes', 'ActiveMinutes', 8792009665, None, None, None, None)
-box_plot(merged_data, 8792009665, 'ActiveMinutes', None, None, None, None)
-timeseries_plot(merged_data, 'ActiveMinutes', 'SedentaryMinutes', 8792009665, None, None, None, None)
+scatter_plot(merged_data, 'SedentaryMinutes', 'ActiveMinutes', None, None, None, None, None)
+box_plot(merged_data, 8792009665, 'TotalSteps', None, '4/1/2016', None, None)
+timeseries_plot(merged_data, 'FairlyActiveMinutes', 'TotalSteps', 8792009665, None, '4/1/2016', None, None, 'h')
