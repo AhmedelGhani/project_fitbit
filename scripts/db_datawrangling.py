@@ -190,7 +190,7 @@ def box_plot (df, ids = None, columns = None, start_date = None, end_date = None
     plt.tight_layout()
     plt.show()
 
-def timeseries_plot(df, columns, ids = None, start_date=None, end_date=None, start_time=None, end_time=None):
+def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, start_time=None, end_time=None):
     df.rename(columns={'date': 'Date'}, inplace=True)
     if 'Date' in df.columns:
         df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %I:%M:%S %p')
@@ -213,26 +213,17 @@ def timeseries_plot(df, columns, ids = None, start_date=None, end_date=None, sta
             ids = [ids]
         df = df[df['Id'].isin(ids)]
     
-    if columns is None:
-        exclude = ['Id', 'LogId', 'IsManualReport', 'ActivityHour']
-        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-        columns = [col for col in numeric_cols if col not in exclude]
-    else:
-        if not isinstance(columns, list):
-            columns = [columns]
-        columns = [col for col in columns if col in df.columns]
-    
     unique_ids = df['Id'].unique()
     n_ids = len(unique_ids)
     fig, axes = plt.subplots(n_ids, 1, figsize=(12, 5 * n_ids), sharex=True)
-    
+
     if n_ids == 1:
         axes = [axes]
     
     for ax, uid in zip(axes, unique_ids):
         df_uid = df[df['Id'] == uid].sort_values(by='Date')
-        ax.plot(df_uid['Date'], df_uid[columns[0]], label=columns[0], marker='o')
-        ax.plot(df_uid['Date'], df_uid[columns[1]], label=columns[1], marker='s')
+        ax.plot(df_uid['Date'], df_uid[col1], label=col1, marker='o')
+        ax.plot(df_uid['Date'], df_uid[col2], label=col2, marker='s')
         ax.set_title(f"Time Series for Id {uid}")
         ax.set_xlabel("Time")
         ax.set_ylabel("Value")
@@ -265,4 +256,4 @@ numeric_summary = numeric_summary (merged_data, None, ['ActiveMinutes', 'Sedenta
 print (numeric_summary)
 scatter_plot(merged_data, 'SedentaryMinutes', 'ActiveMinutes', 8792009665, None, None, None, None)
 box_plot(merged_data, 8792009665, 'ActiveMinutes', None, None, None, None)
-timeseries_plot(merged_data, ['Active Minutes', 'Sedentary Minutes'], 8792009665, None, None, None, None)
+timeseries_plot(merged_data, 'ActiveMinutes', 'SedentaryMinutes', 8792009665, None, None, None, None)
