@@ -47,7 +47,7 @@ def mergingtables(table1, table2, join_column='Id'):
     
     return merged_df
 
-merged_data = mergingtables('minute_sleep', 'daily_activity')
+merged_data = mergingtables('heart_rate', 'hourly_intensity')
 pd.set_option('display.float_format', '{:.0f}'.format)
 print(merged_data)
 
@@ -229,7 +229,6 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
     
     for ax, uid in zip(axes, unique_ids):
         df_uid = df[df['Id'] == uid].sort_values(by='Date')
-        df_uid.interpolate(inplace=True)
         ax.plot(df_uid['Date'], df_uid[col1], label=col1)
         ax.plot(df_uid['Date'], df_uid[col2], label=col2)
         ax.set_title(f"Time Series for Id {uid}")
@@ -240,13 +239,27 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
     plt.tight_layout()
     plt.show()
 
+#----------------------------------------------------------
+merged_data['date'] = pd.to_datetime(merged_data['date'], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
+
+# Define your specific ID (change this to the ID you want)
+specific_id = 8792009665
+# Filter the DataFrame for rows with that ID and where the Date is on or before 4/1/2016
+filtered_data = merged_data[(merged_data['Id'] == specific_id) &
+                            (merged_data['date'] <= pd.to_datetime('4/1/2016', format='%m/%d/%Y'))]
+
+# Create a copy of just the TotalSteps column (adjust column name if needed)
+table_copy = filtered_data[['TotalSteps', 'date']].copy()
+
+# Print the resulting table
+print(table_copy.to_string())
+#----------------------------------------------------------
 
 
-
-merged_data['ActiveMinutes'] = merged_data['VeryActiveMinutes'] + merged_data['FairlyActiveMinutes'] + merged_data['LightlyActiveMinutes']
+#merged_data['ActiveMinutes'] = merged_data['VeryActiveMinutes'] + merged_data['FairlyActiveMinutes'] + merged_data['LightlyActiveMinutes']
 print(merged_data.columns)
-numeric_summary = numeric_summary (merged_data, None, ['ActiveMinutes', 'SedentaryMinutes'], None, None, None, None)
+numeric_summary = numeric_summary (merged_data, None, ['HeartRate', 'HourlyIntensity'], None, None, None, None)
 print (numeric_summary)
-scatter_plot(merged_data, 'SedentaryMinutes', 'ActiveMinutes', None, None, None, None, None)
-box_plot(merged_data, 8792009665, 'TotalSteps', None, '4/1/2016', None, None)
-timeseries_plot(merged_data, 'FairlyActiveMinutes', 'TotalSteps', 8792009665, None, '4/1/2016', None, None, 'h')
+scatter_plot(merged_data, 'HeartRate', 'HourlyIntensity', None, None, None, None, None)
+box_plot(merged_data, 8792009665, 'HeartRate', None, None, None, None)
+timeseries_plot(merged_data, 'FairlyActiveMinutes', 'TotalSteps', 8792009665, '3/30/2016', '4/1/2016', '9:00:00 AM', None, 'T')
