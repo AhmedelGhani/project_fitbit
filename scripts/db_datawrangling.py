@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 from scipy.stats import linregress
+import time
 
 
 connection = sqlite3.connect('fitbit_database.db')
@@ -25,15 +26,54 @@ df = df.drop(columns=['Fat'])
 ##print(df.isnull().sum())
 #print(df)
 
-def mergingtables(table1, table2, join_column='Id'):
-    with sqlite3.connect('fitbit_database.db') as con:
-        table2_cols = pd.read_sql_query(f"PRAGMA table_info({table2})", con)['name'].tolist()
-        table2_cols = [col for col in table2_cols if col != join_column]
-        
-        query = f""" SELECT t1.*, {', '.join(f"t2.{col}" for col in table2_cols)} FROM {table1} AS t1 JOIN {table2} AS t2 ON t1.{join_column} = t2.{join_column}"""
-        return pd.read_sql_query(query, con)
+def mergingtables(table1, table2, join_column='Id', chunksize = 100000):
+    connection = sqlite3.connect('fitbit_database.db')
+    
+    # --- 1. Debug: Check the number of rows in each table ---
+    table1_count = pd.read_sql_query(f"SELECT COUNT(*) AS count FROM {table1}", connection).iloc[0, 0]
+    table2_count = pd.read_sql_query(f"SELECT COUNT(*) AS count FROM {table2}", connection).iloc[0, 0]
+    print(f"Table '{table1}' has {table1_count} rows.")
+    print(f"Table '{table2}' has {table2_count} rows.\n")
+    
+    # --- 2. Debug: Estimate join row count and required chunks ---
+    # (Be aware that counting the join result may be heavy if your tables are huge)
+    join_count_query = f"""SELECT COUNT(*) AS count FROM {table1} AS t1 JOIN {table2} AS t2 ON t1.{join_column} = t2.{join_column} """
+    join_count = pd.read_sql_query(join_count_query, connection).iloc[0, 0]
+    estimated_chunks = join_count // chunksize + (1 if join_count % chunksize else 0)
+    print(f"Join result has approximately {join_count} rows, which will be split into ~{estimated_chunks} chunks (chunksize={chunksize}).\n")
+    
+    # --- 3. Debug: Explain Query Plan ---
+    explain_sql = f"""EXPLAIN QUERY PLAN SELECT t1.*, t2.* FROM {table1} AS t1 JOIN {table2} AS t2 ON t1.{join_column} = t2.{join_column} """
+    explain_plan = pd.read_sql_query(explain_sql, connection)
+    print("EXPLAIN QUERY PLAN output:")
+    print(explain_plan, "\n")
+    
+    # --- 4. Build the main query: exclude the join_column from table2 to avoid duplicates ---
+    table2_cols = pd.read_sql_query(f"PRAGMA table_info({table2})", connection)['name'].tolist()
+    table2_cols = [col for col in table2_cols if col != join_column]
+    query = f"""
+        SELECT t1.*, {', '.join(f"t2.{col}" for col in table2_cols)}
+        FROM {table1} AS t1
+        JOIN {table2} AS t2
+          ON t1.{join_column} = t2.{join_column}
+    """
+    
+    # --- 5. Process the query in chunks and time each chunk load ---
+    chunks = []
+    start_time = time.time()
+    for i, chunk in enumerate(pd.read_sql_query(query, connection, chunksize=chunksize)):
+        elapsed = time.time() - start_time
+        print(f"Chunk {i} loaded with shape {chunk.shape} in {elapsed:.2f} seconds")
+        start_time = time.time()
+        chunks.append(chunk)
+    
+    # --- 6. Combine chunks and close the connection ---
+    merged_df = pd.concat(chunks, ignore_index=True)
+    connection.close()
 
-merged_data = mergingtables('heart_rate', 'weight_log')
+    return merged_df
+
+merged_data = mergingtables('heart_rate', 'hourly_intensity')
 pd.set_option('display.float_format', '{:.0f}'.format)
 print(merged_data)
 
