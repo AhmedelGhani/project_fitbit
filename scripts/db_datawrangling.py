@@ -33,12 +33,14 @@ def mergingtables(table1, table2, join_column='Id'):
     cursor.execute(query_weight)
     first_rows = cursor.fetchall()
     first_columns = [desc[0] for desc in cursor.description]
+    print(first_columns)
     df_first = pd.DataFrame(first_rows, columns=first_columns)
     
     query_other = f'SELECT * FROM "{table2}";'
     cursor.execute(query_other)
     other_rows = cursor.fetchall()
     other_columns = [desc[0] for desc in cursor.description]
+    print(other_columns)
     df_other = pd.DataFrame(other_rows, columns=other_columns)
 
     connection.close()
@@ -52,24 +54,27 @@ pd.set_option('display.float_format', '{:.0f}'.format)
 print(merged_data)
 
 #Add another column to compare
-def numeric_summary(df, ids = None, columns=None, start_date = None, 
-                    end_date = None, start_time = None, end_time = None):
-    df.rename(columns={'date': 'Date'}, inplace=True)
-    if 'Date' in df.columns:
-        df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %I:%M:%S %p')
-        if start_date is not None:
+def numeric_summary(df, ids = None, columns=None, date_col = None, start_date = None, end_date = None, time_col = None, start_time = None, end_time = None):
+    if date_col is not None and time_col is not None:
+        df['timestamp'] = pd.to_datetime(df[date_col].astype(str) + ' ' + df[time_col].astype(str), format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
+    elif date_col is not None:
+        df['timestamp'] = pd.to_datetime(df[date_col], errors='coerce')
+    else:
+        raise ValueError("No valid date_col specified. Please provide at least one column name.")
+    
+    if start_date is not None:
             start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
-            df = df[df['Date'] >= start_date]
-        if end_date is not None:
+            df = df[df['timestamp'] >= start_date]
+    if end_date is not None:
             end_date = pd.to_datetime(end_date, format = '%m/%d/%Y')
-            df = df[df['Date'] <= end_date]
+            df = df[df['timestamp'] <= end_date]
     
     if start_time is not None:
         start_time = pd.to_datetime(start_time, format = '%I:%M:%S %p').time()
-        df = df[df['Date'].dt.time >= start_time]
+        df = df[df['timestamp'].dt.time >= start_time]
     if end_time is not None:
         end_time = pd.to_datetime(end_time, format = '%I:%M:%S %p').time()
-        df = df[df['Date'].dt.time <= end_time]
+        df = df[df['timestamp'].dt.time <= end_time]
     
     if ids is not None:
         if not isinstance (ids,list):
@@ -98,24 +103,28 @@ def numeric_summary(df, ids = None, columns=None, start_date = None,
     grouped_stats = df.groupby('Id')[columns].agg(['mean', 'std', 'min', Q1, 'median', Q3, 'max', IQR, 'count'])
     return grouped_stats
 
-def scatter_plot(df, xcol, ycol, ids= None, start_date = None, end_date = None, start_time = None, end_time = None):
-    df.rename(columns={'date': 'Date'}, inplace=True)
-
-    if 'Date' in df.columns:
-        df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %I:%M:%S %p')
-        if start_date is not None:
+def scatter_plot(df, xcol, ycol, ids= None, date_col = None, start_date = None, end_date = None, time_col = None, start_time = None, end_time = None):
+    
+    if date_col is not None and time_col is not None:
+        df['timestamp'] = pd.to_datetime(df[date_col].astype(str) + ' ' + df[time_col].astype(str), errors='coerce')
+    elif date_col is not None:
+        df['timestamp'] = pd.to_datetime(df[date_col], errors='coerce')
+    else:
+        raise ValueError("No valid date_col specified. Please provide at least one column name.")
+    
+    if start_date is not None:
             start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
-            df = df[df['Date'] >= start_date]
-        if end_date is not None:
+            df = df[df['timestamp'] >= start_date]
+    if end_date is not None:
             end_date = pd.to_datetime(end_date, format = '%m/%d/%Y')
-            df = df[df['Date'] <= end_date]
+            df = df[df['timestamp'] <= end_date]
     
     if start_time is not None:
         start_time = pd.to_datetime(start_time, format = '%I:%M:%S %p').time()
-        df = df[df['Date'].dt.time >= start_time]
+        df = df[df['timestamp'].dt.time >= start_time]
     if end_time is not None:
         end_time = pd.to_datetime(end_time, format = '%I:%M:%S %p').time()
-        df = df[df['Date'].dt.time <= end_time]
+        df = df[df['timestamp'].dt.time <= end_time]
     
     if ids is not None:
         if not isinstance (ids,list):
@@ -145,23 +154,28 @@ def scatter_plot(df, xcol, ycol, ids= None, start_date = None, end_date = None, 
     plt.grid(True)
     plt.show()
 
-def box_plot (df, ids = None, columns = None, start_date = None, end_date = None, start_time = None, end_time = None, ):
-    df.rename(columns={'date': 'Date'}, inplace=True)
-    if 'Date' in df.columns:
-        df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %I:%M:%S %p')
-        if start_date is not None:
+def box_plot (df, ids = None, columns = None, date_col = None, start_date = None, end_date = None, time_col = None, start_time = None, end_time = None, ):
+    
+    if date_col is not None and time_col is not None:
+        df['timestamp'] = pd.to_datetime(df[date_col].astype(str) + ' ' + df[time_col].astype(str), errors='coerce')
+    elif date_col is not None:
+        df['timestamp'] = pd.to_datetime(df[date_col], errors='coerce')
+    else:
+        raise ValueError("No valid date_col specified. Please provide at least one column name.")
+    
+    if start_date is not None:
             start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
-            df = df[df['Date'] >= start_date]
-        if end_date is not None:
+            df = df[df['timestamp'] >= start_date]
+    if end_date is not None:
             end_date = pd.to_datetime(end_date, format = '%m/%d/%Y')
-            df = df[df['Date'] <= end_date]
+            df = df[df['timestamp'] <= end_date]
     
     if start_time is not None:
         start_time = pd.to_datetime(start_time, format = '%I:%M:%S %p').time()
-        df = df[df['Date'].dt.time >= start_time]
+        df = df[df['timestamp'].dt.time >= start_time]
     if end_time is not None:
         end_time = pd.to_datetime(end_time, format = '%I:%M:%S %p').time()
-        df = df[df['Date'].dt.time <= end_time]
+        df = df[df['timestamp'].dt.time <= end_time]
     
     if ids is not None:
         if not isinstance (ids,list):
@@ -191,20 +205,27 @@ def box_plot (df, ids = None, columns = None, start_date = None, end_date = None
     plt.show()
 
 def timeseries_plot(df, col1, col2, ids = None, date_col = None, start_date=None, end_date=None, time_col = None, start_time=None, end_time=None, time_intervals = None):
-    if time_col is not None:
-        # Combine the custom date and time columns. Ensure they are strings.
-        df['Date'] = pd.to_datetime(df[date_col].astype(str) + ' ' + df[time_col].astype(str), errors='coerce')
+    if date_col is not None and time_col is not None:
+        df['timestamp'] = pd.to_datetime(df[date_col].astype(str) + ' ' + df[time_col].astype(str), errors='coerce')
+    elif date_col is not None:
+        df['timestamp'] = pd.to_datetime(df[date_col], errors='coerce')
     else:
-        # Rename the specified date_col to 'Date' and parse it.
-        df.rename(columns={date_col: 'Date'}, inplace=True)
-        df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %I:%M:%S %p', errors='coerce', infer_datetime_format=True)
+        raise ValueError("No valid date_col specified. Please provide at least one column name.")
+    
+    
+    if start_date is not None:
+            start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
+            df = df[df['timestamp'] >= start_date]
+    if end_date is not None:
+            end_date = pd.to_datetime(end_date, format = '%m/%d/%Y')
+            df = df[df['timestamp'] <= end_date]
     
     if start_time is not None:
         start_time = pd.to_datetime(start_time, format = '%I:%M:%S %p').time()
-        df = df[df['Date'].dt.time >= start_time]
+        df = df[df['timestamp'].dt.time >= start_time]
     if end_time is not None:
         end_time = pd.to_datetime(end_time, format = '%I:%M:%S %p').time()
-        df = df[df['Date'].dt.time <= end_time]
+        df = df[df['timestamp'].dt.time <= end_time]
     
     if ids is not None:
         if not isinstance (ids,list):
@@ -213,7 +234,7 @@ def timeseries_plot(df, col1, col2, ids = None, date_col = None, start_date=None
     
     if time_intervals is not None:
         df_copy = df.copy()
-        df_copy.set_index('Date', inplace=True)       
+        df_copy.set_index('timestamp', inplace=True)       
         df_copy = df_copy.groupby('Id').resample(time_intervals)[[col1, col2]].mean()
         df_copy.reset_index(inplace=True)
         df = df_copy
@@ -227,8 +248,8 @@ def timeseries_plot(df, col1, col2, ids = None, date_col = None, start_date=None
     
     for ax, uid in zip(axes, unique_ids):
         df_uid = df[df['Id'] == uid].sort_values(by='Date')
-        ax.plot(df_uid['Date'], df_uid[col1], label=col1)
-        ax.plot(df_uid['Date'], df_uid[col2], label=col2)
+        ax.plot(df_uid['timestamp'], df_uid[col1], label=col1)
+        ax.plot(df_uid['timestamp'], df_uid[col2], label=col2)
         ax.set_title(f"Time Series for Id {uid}")
         ax.set_xlabel("Time")
         ax.set_ylabel("Value")
@@ -256,8 +277,8 @@ def timeseries_plot(df, col1, col2, ids = None, date_col = None, start_date=None
 
 #merged_data['ActiveMinutes'] = merged_data['VeryActiveMinutes'] + merged_data['FairlyActiveMinutes'] + merged_data['LightlyActiveMinutes']
 print(merged_data.columns)
-numeric_summary = numeric_summary (merged_data, None, ['Value', 'WeightKg'], None, None, None, None)
+numeric_summary = numeric_summary (merged_data, None, ['Value', 'BMI'], 'Time', None, None, None, None)
 print (numeric_summary)
-scatter_plot(merged_data, 'Value', 'WeightKg', None, None, None, None, None)
-box_plot(merged_data, 8877689391, 'Value', None, None, None, None)
-timeseries_plot(merged_data, 'Value', 'WeightKg', 8877689391, None, None, None, 'Time', None, None, '2D')
+#scatter_plot(merged_data, 'Value', 'WeightKg', None, None, None, None, None)
+box_plot(merged_data, 8877689391, 'Value', None, None, None, None, None, None)
+timeseries_plot(merged_data, 'Value', 'WeightKg', 8877689391, 'Time', None, None, None, None, None, '2D')
