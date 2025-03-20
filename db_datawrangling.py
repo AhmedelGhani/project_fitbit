@@ -6,25 +6,19 @@ import seaborn as sns
 from scipy.stats import linregress
 import time
 
-
+#Section 4.1, Weight_log table modified to fill in missing values from WeightKg and drop fat column
 connection = sqlite3.connect('fitbit_database.db')
 query = 'SELECT * FROM "weight_log";'
 cursor = connection.cursor()
-cursor.execute(query)
-rows = cursor.fetchall()
-df = pd.DataFrame(rows, columns=[x[0] for x in cursor.description])
-#print(df)
+
+update_query = """UPDATE weight_log SET WeightKg = WeightPounds / 2.20462262185 WHERE WeightKg IS NULL;"""
+cursor.execute(update_query)
+connection.commit()
+
+drop_column_query = "ALTER TABLE weight_log DROP COLUMN Fat;"
+cursor.execute(drop_column_query)
+connection.commit()
 connection.close()
-
-#print("Missing values before handling:")
-#print(df.isnull().sum())
-
-df["WeightKg"] = df["WeightKg"].fillna(df["WeightPounds"] / 2.20462262185)
-df = df.drop(columns=['Fat']) 
-
-#print("Missing values after handling:")
-##print(df.isnull().sum())
-#print(df)
 
 def mergingtables(table1, table2, join_column='Id', chunksize = 100000):
     connection = sqlite3.connect('fitbit_database.db')
