@@ -1,0 +1,38 @@
+Part 3.1: Total sleep Duration per User
+
+        Id         Class TotalSleepDuration
+4020332650    Heavy user           5752 min
+4057192912    Heavy user      Not available
+1503960366    Heavy user           9629 min
+1624580081    Heavy user      Not available
+4702921684 Moderate user          13148 min
+2347167796 Moderate user          13484 min
+4445114986 Moderate user           9581 min
+6962181067 Moderate user          14903 min
+8792009665 Moderate user           5544 min
+2026352035 Moderate user          17504 min
+1844505072 Moderate user           1922 min
+4558609924 Moderate user            656 min
+2873212765 Moderate user      Not available
+2320127002 Moderate user      Not available
+3977333714 Moderate user           6620 min
+4319703577 Moderate user          12951 min
+5553957443 Moderate user          14602 min
+2022484408 Moderate user            144 min
+1927972279 Moderate user          11513 min
+8378563200 Moderate user          15111 min
+8253242879 Moderate user      Not available
+7086361926 Moderate user          10407 min
+8877689391 Moderate user      Not available
+7007744171 Moderate user            561 min
+8053475328 Moderate user            501 min
+5577150313 Moderate user          13885 min
+1644430081    Light user           1922 min
+6290855005    Light user      Not available
+6117666160    Light user          12925 min
+3372868164    Light user      Not available
+6391747486    Light user      Not available
+6775888955    Light user           5294 min
+2891001357    Light user      Not available
+4388161847    Light user      Not available
+8583815059    Light user      Not available

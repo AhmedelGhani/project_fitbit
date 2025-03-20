@@ -1,0 +1,186 @@
+Part 3.6: Weather against total intensity
+
+OLS Regression for ID 8583815059.0
+
+Temperature against total intensity:
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:         TotalIntensity   R-squared:                       0.095
+Model:                            OLS   Adj. R-squared:                  0.060
+Method:                 Least Squares   F-statistic:                     2.729
+Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.111
+Time:                        12:55:49   Log-Likelihood:                -165.27
+No. Observations:                  28   AIC:                             334.5
+Df Residuals:                      26   BIC:                             337.2
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const       -104.0715    122.295     -0.851      0.403    -355.453     147.310
+temp           4.5307      2.743      1.652      0.111      -1.107      10.169
+==============================================================================
+Omnibus:                        1.966   Durbin-Watson:                   0.666
+Prob(Omnibus):                  0.374   Jarque-Bera (JB):                1.695
+Skew:                           0.484   Prob(JB):                        0.428
+Kurtosis:                       2.282   Cond. No.                         314.
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+
+Precipitation against total intensity:
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:         TotalIntensity   R-squared:                       0.000
+Model:                            OLS   Adj. R-squared:                 -0.038
+Method:                 Least Squares   F-statistic:                  0.004516
+Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.947
+Time:                        12:55:49   Log-Likelihood:                -166.67
+No. Observations:                  28   AIC:                             337.3
+Df Residuals:                      26   BIC:                             340.0
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const         96.5603     20.780      4.647      0.000      53.846     139.275
+precip        -5.4061     80.443     -0.067      0.947    -170.759     159.947
+==============================================================================
+Omnibus:                        2.350   Durbin-Watson:                   0.527
+Prob(Omnibus):                  0.309   Jarque-Bera (JB):                2.087
+Skew:                           0.602   Prob(JB):                        0.352
+Kurtosis:                       2.416   Cond. No.                         4.48
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+
+
+
+Part 3.6: Weather against total intensity
+
+OLS Regression for ID 4020332650.0
+
+Temperature against total intensity:
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:         TotalIntensity   R-squared:                       0.043
+Model:                            OLS   Adj. R-squared:                  0.008
+Method:                 Least Squares   F-statistic:                     1.213
+Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.281
+Time:                        12:55:49   Log-Likelihood:                -183.09
+No. Observations:                  29   AIC:                             370.2
+Df Residuals:                      27   BIC:                             372.9
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const        -21.3043    169.478     -0.126      0.901    -369.044     326.435
+temp           4.2248      3.836      1.101      0.281      -3.647      12.096
+==============================================================================
+Omnibus:                       10.797   Durbin-Watson:                   0.564
+Prob(Omnibus):                  0.005   Jarque-Bera (JB):                2.391
+Skew:                          -0.002   Prob(JB):                        0.303
+Kurtosis:                       1.593   Cond. No.                         291.
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+
+Precipitation against total intensity:
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:         TotalIntensity   R-squared:                       0.001
+Model:                            OLS   Adj. R-squared:                 -0.036
+Method:                 Least Squares   F-statistic:                   0.03697
+Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.849
+Time:                        12:55:49   Log-Likelihood:                -183.71
+No. Observations:                  29   AIC:                             371.4
+Df Residuals:                      27   BIC:                             374.2
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const        165.8632     29.755      5.574      0.000     104.812     226.915
+precip       -22.5399    117.222     -0.192      0.849    -263.060     217.980
+==============================================================================
+Omnibus:                        9.267   Durbin-Watson:                   0.593
+Prob(Omnibus):                  0.010   Jarque-Bera (JB):                2.249
+Skew:                           0.006   Prob(JB):                        0.325
+Kurtosis:                       1.636   Cond. No.                         4.53
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+
+
+
+Part 3.6: Weather against total intensity
+
+OLS Regression for ID 7086361926.0
+
+Temperature against total intensity:
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:         TotalIntensity   R-squared:                       0.015
+Model:                            OLS   Adj. R-squared:                 -0.021
+Method:                 Least Squares   F-statistic:                    0.4127
+Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.526
+Time:                        12:55:49   Log-Likelihood:                -180.13
+No. Observations:                  29   AIC:                             364.3
+Df Residuals:                      27   BIC:                             367.0
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const        322.7871    153.023      2.109      0.044       8.811     636.763
+temp          -2.2252      3.464     -0.642      0.526      -9.333       4.882
+==============================================================================
+Omnibus:                        0.469   Durbin-Watson:                   1.682
+Prob(Omnibus):                  0.791   Jarque-Bera (JB):                0.575
+Skew:                           0.021   Prob(JB):                        0.750
+Kurtosis:                       2.311   Cond. No.                         291.
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+
+Precipitation against total intensity:
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:         TotalIntensity   R-squared:                       0.016
+Model:                            OLS   Adj. R-squared:                 -0.021
+Method:                 Least Squares   F-statistic:                    0.4316
+Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.517
+Time:                        12:55:49   Log-Likelihood:                -180.12
+No. Observations:                  29   AIC:                             364.2
+Df Residuals:                      27   BIC:                             367.0
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const        217.4977     26.291      8.273      0.000     163.553     271.442
+precip        68.0432    103.576      0.657      0.517    -144.477     280.564
+==============================================================================
+Omnibus:                        1.518   Durbin-Watson:                   1.652
+Prob(Omnibus):                  0.468   Jarque-Bera (JB):                0.987
+Skew:                           0.021   Prob(JB):                        0.610
+Kurtosis:                       2.097   Cond. No.                         4.53
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+
+
+
