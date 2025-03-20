@@ -69,4 +69,3 @@ def mergingtables(table1, table2, join_column='Id', chunksize = 100000):
 
 merged_data = mergingtables('heart_rate', 'weight_log')
 pd.set_option('display.float_format', '{:.0f}'.format)
-print(merged_data)

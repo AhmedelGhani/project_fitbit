@@ -54,13 +54,13 @@ def numeric_summary(df, datetime_col, ids = None, columns=None, start_date = Non
     grouped_stats = df.groupby('Id')[columns].agg(['mean', 'std', 'min', Q1, 'median', Q3, 'max', IQR, 'count'])
     return grouped_stats
 
-def scatter_plot(df, xcol, ycol, ids= None, datetime_col = None, start_date = None, end_date = None, start_time = None, end_time = None):
+def scatter_plot(df, xcol, ycol, datetime_col, ids= None, start_date = None, end_date = None, start_time = None, end_time = None):
     
     if 'Id' in df.index.names:
         df = df.reset_index()
         
     if datetime_col is None:
-        raise ValueError("Please provide a valid datetime column name (datetime_col).")
+        print("Please provide a valid datetime column name.")
     
     df['timestamp'] = pd.to_datetime (df[datetime_col], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
     
@@ -106,13 +106,13 @@ def scatter_plot(df, xcol, ycol, ids= None, datetime_col = None, start_date = No
     plt.grid(True)
     plt.show()
 
-def box_plot (df, ids = None, columns = None, datetime_col = None, start_date = None, end_date = None, start_time = None, end_time = None, ):
+def box_plot (df, datetime_col, ids = None, columns = None, start_date = None, end_date = None, start_time = None, end_time = None, ):
     
     if 'Id' in df.index.names:
         df = df.reset_index()
         
     if datetime_col is None:
-        raise ValueError("Please provide a valid datetime column name (datetime_col).")
+        print("Please provide a valid datetime column name.")
     
     df['timestamp'] = pd.to_datetime (df[datetime_col], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
     
@@ -157,22 +157,21 @@ def box_plot (df, ids = None, columns = None, datetime_col = None, start_date = 
     plt.tight_layout()
     plt.show()
 
-def timeseries_plot(df, col1, col2, ids = None, datetime_col = None, start_date=None, end_date=None, start_time=None, end_time=None, time_intervals = None):
+def timeseries_plot(df, col1, col2, datetime_col, ids = None, start_date=None, end_date=None, start_time=None, end_time=None, time_intervals = None):
     if 'Id' in df.index.names:
         df = df.reset_index()
         
     if datetime_col is None:
-        raise ValueError("Please provide a valid datetime column name (datetime_col).")
+        print("Please provide a valid datetime column name.")
     
     df['timestamp'] = pd.to_datetime (df[datetime_col], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
-    
     
     if start_date is not None:
             start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
             df = df[df['timestamp'] >= start_date]
     if end_date is not None:
-            end_date = pd.to_datetime(end_date, format = '%m/%d/%Y')
-            df = df[df['timestamp'] <= end_date]
+            end_date = pd.to_datetime(end_date, format = '%m/%d/%Y') + pd.Timedelta(days=1)
+            df = df[df['timestamp'] < end_date]
     
     if start_time is not None:
         start_time = pd.to_datetime(start_time, format = '%I:%M:%S %p').time()
@@ -202,7 +201,7 @@ def timeseries_plot(df, col1, col2, ids = None, datetime_col = None, start_date=
     
     for ax, uid in zip(axes, unique_ids):
         df_uid = df[df['Id'] == uid].sort_values(by='timestamp')
-        ax.plot(df_uid['timestamp'], df_uid[col1], label=col1)
+        ax.plot(df_uid['timestamp'], df_uid[col1], label=col1, marker = 'o')
         ax.plot(df_uid['timestamp'], df_uid[col2], label=col2)
         ax.set_title(f"Time Series for Id {uid}")
         ax.set_xlabel("Time")
@@ -216,6 +215,6 @@ def timeseries_plot(df, col1, col2, ids = None, datetime_col = None, start_date=
 print(merged_data.columns)
 numeric_summary = numeric_summary (merged_data, 'Time', None, ['Value', 'BMI'], None, None, None, None)
 print (numeric_summary)
-scatter_plot(merged_data, 'Value', 'WeightKg', None, 'Time', None, None, None, None)
-box_plot(merged_data, 8877689391, 'Value', 'Time', None, None, None, None)
-timeseries_plot(merged_data, 'Value', 'WeightKg', 8877689391, 'Time', None, None, None, None, '2D')
+scatter_plot(merged_data, 'Value', 'WeightKg', 'Time', None, None, None, None, None)
+box_plot(merged_data, 'Time', 6962181067, 'Value', None, None, None, None)
+timeseries_plot(merged_data, 'Value', 'WeightKg', 'Time', 6962181067, '3/30/2016', '3/31/2016', None, None, '60min')

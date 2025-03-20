@@ -1,3 +1,5 @@
+from db_datawrangling import mergingtables, merged_data
+from db_datavisualization import numeric_summary, scatter_plot, box_plot, timeseries_plot
 from scripts.data_loader import load_data
 from scripts.data_analysis import plot_total_distance, plot_calories_per_day, get_unique_users, compute_total_distance
 
