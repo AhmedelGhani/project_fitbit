@@ -109,6 +109,10 @@ plt.legend()
 plt.tight_layout()
 plt.savefig('part3Q3Scatterplot.png')
 
+with open("part3Q3OLS.txt", "w") as f:
+    f.write("Part 3.3: Sleep minutes vs Total Active Minutes\n\n")
+    f.write(str(modelSedentary.summary()))
+
 
 # Part 3.4: Average steps, calories burnt, and minutes of sleep per 4 hour time blocks
 querySteps = 'SELECT * FROM "hourly_steps";'

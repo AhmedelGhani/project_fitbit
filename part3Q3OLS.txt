@@ -1,0 +1,29 @@
+Part 3.3: Sleep minutes vs Total Active Minutes
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:           SleepMinutes   R-squared:                       0.358
+Model:                            OLS   Adj. R-squared:                  0.355
+Method:                 Least Squares   F-statistic:                     109.8
+Date:                Fri, 21 Mar 2025   Prob (F-statistic):           1.04e-20
+Time:                        15:48:27   Log-Likelihood:                -1236.3
+No. Observations:                 199   AIC:                             2477.
+Df Residuals:                     197   BIC:                             2483.
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+====================================================================================
+                       coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------------
+const              765.6225     33.152     23.094      0.000     700.244     831.001
+SedentaryMinutes    -0.4594      0.044    -10.480      0.000      -0.546      -0.373
+==============================================================================
+Omnibus:                       19.730   Durbin-Watson:                   1.652
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               42.367
+Skew:                          -0.447   Prob(JB):                     6.31e-10
+Kurtosis:                       5.076   Cond. No.                     2.91e+03
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 2.91e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.

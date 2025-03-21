@@ -1,6 +1,6 @@
 Part 3.6: Weather against total intensity
 
-OLS Regression for ID 3372868164.0
+OLS Regression for ID 1844505072.0
 
 Temperature against total intensity:
 
@@ -8,23 +8,23 @@ Temperature against total intensity:
 ==============================================================================
 Dep. Variable:         TotalIntensity   R-squared:                       0.006
 Model:                            OLS   Adj. R-squared:                 -0.031
-Method:                 Least Squares   F-statistic:                    0.1678
-Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.685
-Time:                        23:07:56   Log-Likelihood:                -154.74
-No. Observations:                  29   AIC:                             313.5
-Df Residuals:                      27   BIC:                             316.2
+Method:                 Least Squares   F-statistic:                    0.1584
+Date:                Fri, 21 Mar 2025   Prob (F-statistic):              0.694
+Time:                        15:48:41   Log-Likelihood:                -176.43
+No. Observations:                  29   AIC:                             356.9
+Df Residuals:                      27   BIC:                             359.6
 Df Model:                           1                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const        361.9202     63.754      5.677      0.000     231.108     492.732
-temp          -0.5912      1.443     -0.410      0.685      -3.552       2.370
+const        114.4053    134.700      0.849      0.403    -161.976     390.787
+temp          -1.2136      3.049     -0.398      0.694      -7.470       5.043
 ==============================================================================
-Omnibus:                        4.546   Durbin-Watson:                   2.458
-Prob(Omnibus):                  0.103   Jarque-Bera (JB):                1.831
-Skew:                           0.218   Prob(JB):                        0.400
-Kurtosis:                       1.849   Cond. No.                         291.
+Omnibus:                        9.544   Durbin-Watson:                   0.546
+Prob(Omnibus):                  0.008   Jarque-Bera (JB):                9.065
+Skew:                           1.365   Prob(JB):                       0.0108
+Kurtosis:                       3.231   Cond. No.                         291.
 ==============================================================================
 
 Notes:
@@ -34,25 +34,25 @@ Precipitation against total intensity:
 
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:         TotalIntensity   R-squared:                       0.035
-Model:                            OLS   Adj. R-squared:                 -0.001
-Method:                 Least Squares   F-statistic:                    0.9847
-Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.330
-Time:                        23:07:56   Log-Likelihood:                -154.31
-No. Observations:                  29   AIC:                             312.6
-Df Residuals:                      27   BIC:                             315.4
+Dep. Variable:         TotalIntensity   R-squared:                       0.011
+Model:                            OLS   Adj. R-squared:                 -0.026
+Method:                 Least Squares   F-statistic:                    0.3019
+Date:                Fri, 21 Mar 2025   Prob (F-statistic):              0.587
+Time:                        15:48:41   Log-Likelihood:                -176.36
+No. Observations:                  29   AIC:                             356.7
+Df Residuals:                      27   BIC:                             359.4
 Df Model:                           1                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const        331.0648     10.796     30.665      0.000     308.913     353.217
-precip        42.2073     42.533      0.992      0.330     -45.063     129.478
+const         67.3809     23.090      2.918      0.007      20.004     114.758
+precip       -49.9848     90.965     -0.549      0.587    -236.630     136.661
 ==============================================================================
-Omnibus:                        3.490   Durbin-Watson:                   2.457
-Prob(Omnibus):                  0.175   Jarque-Bera (JB):                1.922
-Skew:                           0.364   Prob(JB):                        0.383
-Kurtosis:                       1.970   Cond. No.                         4.53
+Omnibus:                        8.901   Durbin-Watson:                   0.531
+Prob(Omnibus):                  0.012   Jarque-Bera (JB):                8.467
+Skew:                           1.323   Prob(JB):                       0.0145
+Kurtosis:                       3.101   Cond. No.                         4.53
 ==============================================================================
 
 Notes:
@@ -62,7 +62,7 @@ Notes:
 
 Part 3.6: Weather against total intensity
 
-OLS Regression for ID 6775888955.0
+OLS Regression for ID 2022484408.0
 
 Temperature against total intensity:
 
@@ -70,23 +70,23 @@ Temperature against total intensity:
 ==============================================================================
 Dep. Variable:         TotalIntensity   R-squared:                       0.003
 Model:                            OLS   Adj. R-squared:                 -0.034
-Method:                 Least Squares   F-statistic:                   0.08766
-Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.769
-Time:                        23:07:56   Log-Likelihood:                -200.10
-No. Observations:                  29   AIC:                             404.2
-Df Residuals:                      27   BIC:                             406.9
+Method:                 Least Squares   F-statistic:                   0.09225
+Date:                Fri, 21 Mar 2025   Prob (F-statistic):              0.764
+Time:                        15:48:41   Log-Likelihood:                -173.14
+No. Observations:                  29   AIC:                             350.3
+Df Residuals:                      27   BIC:                             353.0
 Df Model:                           1                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const        333.2584    304.647      1.094      0.284    -291.827     958.343
-temp          -2.0418      6.896     -0.296      0.769     -16.191      12.108
+const        483.4760    120.235      4.021      0.000     236.774     730.178
+temp          -0.8267      2.722     -0.304      0.764      -6.411       4.758
 ==============================================================================
-Omnibus:                        4.959   Durbin-Watson:                   1.181
-Prob(Omnibus):                  0.084   Jarque-Bera (JB):                4.385
-Skew:                           0.945   Prob(JB):                        0.112
-Kurtosis:                       2.756   Cond. No.                         291.
+Omnibus:                        0.329   Durbin-Watson:                   1.361
+Prob(Omnibus):                  0.848   Jarque-Bera (JB):                0.462
+Skew:                          -0.209   Prob(JB):                        0.794
+Kurtosis:                       2.544   Cond. No.                         291.
 ==============================================================================
 
 Notes:
@@ -96,25 +96,25 @@ Precipitation against total intensity:
 
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:         TotalIntensity   R-squared:                       0.006
-Model:                            OLS   Adj. R-squared:                 -0.031
-Method:                 Least Squares   F-statistic:                    0.1530
-Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.699
-Time:                        23:07:56   Log-Likelihood:                -200.07
-No. Observations:                  29   AIC:                             404.1
-Df Residuals:                      27   BIC:                             406.9
+Dep. Variable:         TotalIntensity   R-squared:                       0.063
+Model:                            OLS   Adj. R-squared:                  0.028
+Method:                 Least Squares   F-statistic:                     1.815
+Date:                Fri, 21 Mar 2025   Prob (F-statistic):              0.189
+Time:                        15:48:41   Log-Likelihood:                -172.24
+No. Observations:                  29   AIC:                             348.5
+Df Residuals:                      27   BIC:                             351.2
 Df Model:                           1                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const        253.7239     52.297      4.852      0.000     146.420     361.028
-precip       -80.5872    206.029     -0.391      0.699    -503.323     342.149
+const        434.6832     20.037     21.694      0.000     393.570     475.797
+precip       106.3513     78.940      1.347      0.189     -55.620     268.323
 ==============================================================================
-Omnibus:                        4.924   Durbin-Watson:                   1.189
-Prob(Omnibus):                  0.085   Jarque-Bera (JB):                4.431
-Skew:                           0.944   Prob(JB):                        0.109
-Kurtosis:                       2.675   Cond. No.                         4.53
+Omnibus:                        1.271   Durbin-Watson:                   1.435
+Prob(Omnibus):                  0.530   Jarque-Bera (JB):                1.214
+Skew:                          -0.421   Prob(JB):                        0.545
+Kurtosis:                       2.456   Cond. No.                         4.53
 ==============================================================================
 
 Notes:
@@ -124,31 +124,31 @@ Notes:
 
 Part 3.6: Weather against total intensity
 
-OLS Regression for ID 4702921684.0
+OLS Regression for ID 2320127002.0
 
 Temperature against total intensity:
 
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:         TotalIntensity   R-squared:                       0.006
-Model:                            OLS   Adj. R-squared:                 -0.031
-Method:                 Least Squares   F-statistic:                    0.1518
-Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.700
-Time:                        23:07:56   Log-Likelihood:                -182.06
-No. Observations:                  29   AIC:                             368.1
-Df Residuals:                      27   BIC:                             370.9
+Dep. Variable:         TotalIntensity   R-squared:                       0.049
+Model:                            OLS   Adj. R-squared:                  0.014
+Method:                 Least Squares   F-statistic:                     1.406
+Date:                Fri, 21 Mar 2025   Prob (F-statistic):              0.246
+Time:                        15:48:41   Log-Likelihood:                -172.63
+No. Observations:                  29   AIC:                             349.3
+Df Residuals:                      27   BIC:                             352.0
 Df Model:                           1                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const        229.8840    163.558      1.406      0.171    -105.708     565.476
-temp           1.4423      3.702      0.390      0.700      -6.154       9.039
+const        198.0979    118.131      1.677      0.105     -44.287     440.483
+temp          -3.1705      2.674     -1.186      0.246      -8.657       2.316
 ==============================================================================
-Omnibus:                        0.993   Durbin-Watson:                   0.816
-Prob(Omnibus):                  0.609   Jarque-Bera (JB):                0.194
-Skew:                           0.041   Prob(JB):                        0.908
-Kurtosis:                       3.392   Cond. No.                         291.
+Omnibus:                       10.785   Durbin-Watson:                   1.009
+Prob(Omnibus):                  0.005   Jarque-Bera (JB):                9.707
+Skew:                           1.355   Prob(JB):                      0.00780
+Kurtosis:                       3.829   Cond. No.                         291.
 ==============================================================================
 
 Notes:
@@ -158,25 +158,25 @@ Precipitation against total intensity:
 
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:         TotalIntensity   R-squared:                       0.002
-Model:                            OLS   Adj. R-squared:                 -0.035
-Method:                 Least Squares   F-statistic:                   0.04084
-Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.841
-Time:                        23:07:56   Log-Likelihood:                -182.12
-No. Observations:                  29   AIC:                             368.2
-Df Residuals:                      27   BIC:                             371.0
+Dep. Variable:         TotalIntensity   R-squared:                       0.037
+Model:                            OLS   Adj. R-squared:                  0.002
+Method:                 Least Squares   F-statistic:                     1.052
+Date:                Fri, 21 Mar 2025   Prob (F-statistic):              0.314
+Time:                        15:48:41   Log-Likelihood:                -172.81
+No. Observations:                  29   AIC:                             349.6
+Df Residuals:                      27   BIC:                             352.4
 Df Model:                           1                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const        290.1850     28.168     10.302      0.000     232.389     347.981
-precip        22.4248    110.972      0.202      0.841    -205.271     250.120
+const         49.8009     20.431      2.438      0.022       7.880      91.722
+precip        82.5462     80.490      1.026      0.314     -82.606     247.698
 ==============================================================================
-Omnibus:                        1.091   Durbin-Watson:                   0.845
-Prob(Omnibus):                  0.579   Jarque-Bera (JB):                0.237
-Skew:                          -0.011   Prob(JB):                        0.888
-Kurtosis:                       3.442   Cond. No.                         4.53
+Omnibus:                        8.452   Durbin-Watson:                   0.811
+Prob(Omnibus):                  0.015   Jarque-Bera (JB):                7.743
+Skew:                           1.262   Prob(JB):                       0.0208
+Kurtosis:                       3.180   Cond. No.                         4.53
 ==============================================================================
 
 Notes:
