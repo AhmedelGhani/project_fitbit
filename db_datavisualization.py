@@ -1,4 +1,4 @@
-from db_datawrangling import mergingtables, merged_data
+from scripts.db_datawrangling import mergingtables, merged_data
 import sqlite3
 from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
