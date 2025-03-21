@@ -1,6 +1,7 @@
 from db_datawrangling import mergingtables, merged_data
 import sqlite3
 from matplotlib import pyplot as plt
+import matplotlib.dates as mdates
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -210,8 +211,8 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
     plt.show()
 
 
-numeric_summary = numeric_summary (merged_data,  None, ['Value', 'Calories'], None, None, None, None)
+numeric_summary = numeric_summary (merged_data,  None, ['Value', 'TotalIntensity'], None, None, None, None)
 print (numeric_summary)
-scatter_plot(merged_data, 'Value', 'Calories', None, None, None, None, None)
+scatter_plot(merged_data, 'Value', 'TotalIntensity', None, None, None, None, None)
 box_plot(merged_data, 6962181067, 'Value', None, None, None, None)
-timeseries_plot(merged_data, 'Value', 'Calories', 6962181067, '3/30/2016', '3/31/2016', None, None, '60min')
+timeseries_plot(merged_data, 'Value', 'TotalIntensity', 6962181067, '3/30/2016', '3/31/2016', None, None, '60min')

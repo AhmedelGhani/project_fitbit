@@ -30,11 +30,16 @@ def mergingtables(table1, table2, time_column1=None, time_column2=None):
     df2 = pd.read_sql_query(f"SELECT * FROM {table2}", connection)
     
     if time_column1 and time_column2:
-        df1[time_column1] = pd.to_datetime(df1[time_column1], errors='coerce').dt.round('H')
-        df2[time_column2] = pd.to_datetime(df2[time_column2], errors='coerce').dt.round('H')
-        merged = pd.merge(df1, df2, how='inner', left_on=['Id', time_column1], right_on=['Id', time_column2])
-        merged['Date/Time'] = merged[time_column1] 
-        merged.drop(columns=[time_column1, time_column2], inplace=True)
+        df1[time_column1] = pd.to_datetime(df1[time_column1], errors='coerce')
+        df2[time_column2] = pd.to_datetime(df2[time_column2], errors='coerce')
+
+        df1_resampled = (df1.groupby(['Id', pd.Grouper(key=time_column1, freq='1H')]).mean(numeric_only=True).reset_index())
+        df2_resampled = (df2.groupby(['Id', pd.Grouper(key=time_column2, freq='1H')]).mean(numeric_only=True).reset_index())
+
+        df1_resampled.rename(columns={time_column1: 'Date/Time'}, inplace=True)
+        df2_resampled.rename(columns={time_column2: 'Date/Time'}, inplace=True)
+
+        merged = pd.merge(df1_resampled, df2_resampled, how='inner', on=['Id', 'Date/Time'])
     else:
         merged = pd.merge(df1, df2, on='Id', how='inner')
 
@@ -44,5 +49,5 @@ def mergingtables(table1, table2, time_column1=None, time_column2=None):
 conn = sqlite3.connect('fitbit_database.db')
 
 pd.set_option('display.float_format', '{:.0f}'.format)
-merged_data = mergingtables('heart_rate', 'hourly_calories', 'Time', 'ActivityHour')
+merged_data = mergingtables('heart_rate', 'hourly_intensity', 'Time', 'ActivityHour')
 print(merged_data)
