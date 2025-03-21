@@ -48,7 +48,7 @@ def numeric_summary(df, ids = None, columns=None, start_date = None, end_date = 
         return series.quantile(0.75)
 
     print("Rows after time filter:", len(df))
-    grouped_stats = df.groupby('Id')[columns].agg(['mean', 'std', 'min', Q1, 'median', Q3, 'max', IQR, 'count'])
+    grouped_stats = df.groupby('Id')[columns].agg(['mean', 'std', 'min', Q1, 'median', Q3, 'max', IQR, 'count', 'sum'])
     return grouped_stats
 
 def scatter_plot(df, xcol, ycol, ids= None, start_date = None, end_date = None, start_time = None, end_time = None):
@@ -210,9 +210,8 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
     plt.show()
 
 
-#print(merged_data.columns)
-numeric_summary = numeric_summary (merged_data,  None, ['Value', 'TotalIntensity'], None, None, None, None)
+numeric_summary = numeric_summary (merged_data,  None, ['Value', 'Calories'], None, None, None, None)
 print (numeric_summary)
-scatter_plot(merged_data, 'Value', 'TotalIntensity', None, None, None, None, None)
+scatter_plot(merged_data, 'Value', 'Calories', None, None, None, None, None)
 box_plot(merged_data, 6962181067, 'Value', None, None, None, None)
-timeseries_plot(merged_data, 'Value', 'TotalIntensity', 6962181067, '3/30/2016', '3/31/2016', None, None, '60min')
+timeseries_plot(merged_data, 'Value', 'Calories', 6962181067, '3/30/2016', '3/31/2016', None, None, '60min')
