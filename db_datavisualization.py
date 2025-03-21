@@ -1,4 +1,4 @@
-from db_datawrangling import mergingtables, merged_data
+from db_datawrangling import mergingtables
 import sqlite3
 from matplotlib import pyplot as plt
 import pandas as pd
@@ -212,6 +212,7 @@ def timeseries_plot(df, col1, col2, datetime_col, ids = None, start_date=None, e
     plt.show()
 
 
+merged_data = mergingtables('heart_rate', 'hourly_intensity')
 print(merged_data.columns)
 numeric_summary = numeric_summary (merged_data, 'Time', None, ['Value', 'BMI'], None, None, None, None)
 print (numeric_summary)
