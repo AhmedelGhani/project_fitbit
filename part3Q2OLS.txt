@@ -6,7 +6,7 @@ Dep. Variable:           SleepMinutes   R-squared:                       0.011
 Model:                            OLS   Adj. R-squared:                  0.006
 Method:                 Least Squares   F-statistic:                     2.247
 Date:                Thu, 20 Mar 2025   Prob (F-statistic):              0.135
-Time:                        12:55:34   Log-Likelihood:                -1279.3
+Time:                        23:07:43   Log-Likelihood:                -1279.3
 No. Observations:                 199   AIC:                             2563.
 Df Residuals:                     197   BIC:                             2569.
 Df Model:                           1                                         
