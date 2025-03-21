@@ -23,16 +23,18 @@ if 'Fat' in columns:
 connection.close()
 
 #4.2: Functions for merging tables based on individual ID
-def mergingtables(table1, table2, columns1, columns2, time_column1=None, time_column2=None, chunksize = 100000):
+def mergingtables(table1, table2, time_column1=None, time_column2=None):
     connection = sqlite3.connect('fitbit_database.db')
     
-    df1 = pd.read_sql_query(f"SELECT {', '.join(columns1)} FROM {table1}", connection)
-    df2 = pd.read_sql_query(f"SELECT {', '.join(columns2)} FROM {table2}", connection)
+    df1 = pd.read_sql_query(f"SELECT * FROM {table1}", connection)
+    df2 = pd.read_sql_query(f"SELECT * FROM {table2}", connection)
     
     if time_column1 and time_column2:
         df1[time_column1] = pd.to_datetime(df1[time_column1], errors='coerce').dt.round('H')
         df2[time_column2] = pd.to_datetime(df2[time_column2], errors='coerce').dt.round('H')
         merged = pd.merge(df1, df2, how='inner', left_on=['Id', time_column1], right_on=['Id', time_column2])
+        merged['Date/Time'] = merged[time_column1] 
+        merged.drop(columns=[time_column1, time_column2], inplace=True)
     else:
         merged = pd.merge(df1, df2, on='Id', how='inner')
 
@@ -40,11 +42,7 @@ def mergingtables(table1, table2, columns1, columns2, time_column1=None, time_co
     return merged
 
 conn = sqlite3.connect('fitbit_database.db')
-df = pd.read_sql_query("SELECT * FROM heart_rate", conn)
-conn.close()
-
-print(df)  
 
 pd.set_option('display.float_format', '{:.0f}'.format)
-merged_data = mergingtables('hourly_steps', 'minute_sleep', ['Id','ActivityHour', 'StepTotal'], ['Id','date', 'value'], 'ActivityHour', 'date')
+merged_data = mergingtables('heart_rate', 'hourly_intensity', 'Time', 'ActivityHour')
 print(merged_data)

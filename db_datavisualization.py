@@ -201,11 +201,21 @@ def timeseries_plot(df, col1, col2, datetime_col, ids = None, start_date=None, e
     
     for ax, uid in zip(axes, unique_ids):
         df_uid = df[df['Id'] == uid].sort_values(by='timestamp')
-        ax.plot(df_uid['timestamp'], df_uid[col1], label=col1, marker = 'o')
-        ax.plot(df_uid['timestamp'], df_uid[col2], label=col2, marker = 'o')
-        ax.set_title(f"Time Series for Id {uid}")
+        
+        ax2 = ax.twinx()
+        ax.plot(df_uid['timestamp'], df_uid[col1], color = 'red', label=col1, marker = 'o')
+        ax.set_ylabel(col1, color = 'red')
+        ax.tick_params(axis='y', labelcolor = 'red')
+
+        ax.plot(df_uid['timestamp'], df_uid[col2], color = 'blue', label=col2, marker = 'o')
+        ax.set_ylabel(col2, color = 'blue')
+        ax.tick_params(axis='y', labelcolor = 'blue')
+
+        start_str = df_uid['timestamp'].dt.date.min().strftime('%Y-%m-%d') if not df_uid.empty else ''
+        end_str = df_uid['timestamp'].dt.date.max().strftime('%Y-%m-%d') if not df_uid.empty else ''
+        ax.set_title(f"{col1} and {col2} for Id {uid} on {start_str} and {end_str}")
+        
         ax.set_xlabel("Time")
-        ax.set_ylabel("Value")
         ax.legend()
     
     plt.tight_layout()
