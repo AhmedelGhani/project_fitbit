@@ -27,33 +27,152 @@ connection.close()
 activity["ActivityDate"] = pd.to_datetime(activity["ActivityDate"])
 
 if selected == "Home":
+    import matplotlib.pyplot as plt
+    import pandas as pd
+    import sqlite3
+    from PIL import Image
+
+    st.write("<style>h1 { text-align: center; }</style>", unsafe_allow_html=True)
     st.title("Fitbit Data Dashboard")
-    st.subheader("Overview of Research Statistics")
-    st.markdown("This dashboard presents key statistics based on Fitbit activity, sleep, and other daily metrics.")
 
-    st.markdown("Filter by Date")
-    min_date, max_date = activity["ActivityDate"].min(), activity["ActivityDate"].max()
-    selected_dates = st.date_input("Select date range", [min_date, max_date], min_value=min_date, max_value=max_date)
+    num_participants = activity["Id"].nunique()
+    avg_steps = activity["TotalSteps"].mean()
+    avg_calories = activity["Calories"].mean()
+    avg_active = (activity["VeryActiveMinutes"] + activity["FairlyActiveMinutes"] + activity["LightlyActiveMinutes"]).mean()
+    avg_sedentary = activity["SedentaryMinutes"].mean()
 
-    if isinstance(selected_dates, list) and len(selected_dates) == 2:
-        activity_filtered = activity[(activity["ActivityDate"] >= pd.to_datetime(selected_dates[0])) & (activity["ActivityDate"] <= pd.to_datetime(selected_dates[1]))]
-    else:
-        activity_filtered = activity
+    col1, col2, col3, col4, col5 = st.columns(5)
+    col1.markdown(f"""
+        <div style="background-color: #002a3a; border-radius: 10px; 
+                    padding: 15px; text-align: center;">
+            <h4 style="color: white; margin: 0;">Participants</h4>
+            <p style="color: white; margin: 0;">{num_participants}</p>
+        </div>
+    """, unsafe_allow_html=True)
+    col2.markdown(f"""
+        <div style="background-color: #002a3a; border-radius: 10px; 
+                    padding: 15px; text-align: center;">
+            <h4 style="color: white; margin: 0;">Avg Steps</h4>
+            <p style="color: white; margin: 0;">{avg_steps:.0f}</p>
+        </div>
+    """, unsafe_allow_html=True)
+    col3.markdown(f"""
+        <div style="background-color: #002a3a; border-radius: 10px; 
+                    padding: 15px; text-align: center;">
+            <h4 style="color: white; margin: 0;">Avg Calories</h4>
+            <p style="color: white; margin: 0;">{avg_calories:.0f} kcal</p>
+        </div>
+    """, unsafe_allow_html=True)
+    col4.markdown(f"""
+        <div style="background-color: #002a3a; border-radius: 10px; 
+                    padding: 15px; text-align: center;">
+            <h4 style="color: white; margin: 0;">Avg Active Min</h4>
+            <p style="color: white; margin: 0;">{avg_active:.1f} min</p>
+        </div>
+    """, unsafe_allow_html=True)
+    col5.markdown(f"""
+        <div style="background-color: #002a3a; border-radius: 10px; 
+                    padding: 15px; text-align: center;">
+            <h4 style="color: white; margin: 0;">Avg Sedentary Min</h4>
+            <p style="color: white; margin: 0;">{avg_sedentary:.1f} min</p>
+        </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("Numerical Summary")
-    avg_stats = {
-        "Average Total Active Minutes": activity_filtered["VeryActiveMinutes"].add(activity_filtered["FairlyActiveMinutes"]).add(activity_filtered["LightlyActiveMinutes"]).mean(),
-        "Average Sedentary Minutes": activity_filtered["SedentaryMinutes"].mean(),
-        "Average Calories Burnt": activity_filtered["Calories"].mean(),
-        "Average Steps": activity_filtered["TotalSteps"].mean()
-    }
-    summary_df = pd.DataFrame(avg_stats, index=["Average Value"]).T
-    st.dataframe(summary_df.style.format("{:.2f}"))
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    st.markdown("Graphical Summary")
-    st.markdown("Below is a graphical summary showing average steps, calories burnt, and sleep minutes across different 4-hour blocks.")
-    image = Image.open("part3Q4Averages.png")
-    st.image(image, caption="Average per 4-hour block", use_container_width=True)
+    conn = sqlite3.connect('fitbit_database.db')
+    steps = pd.read_sql_query("SELECT * FROM hourly_steps;", conn)
+    steps['Hour'] = pd.to_datetime(steps['ActivityHour']).dt.hour
+    steps['Block'] = pd.cut(
+        steps['Hour'], 
+        bins=[0,4,8,12,16,20,24],
+        labels=['0 – 4','4 – 8','8 – 12','12 – 16','16 – 20','20 – 24'],
+        right=False
+    )
+    avgStepsBlock = steps.groupby('Block')['StepTotal'].mean().reset_index(name='AverageSteps')
+
+    calories = pd.read_sql_query("SELECT * FROM hourly_calories;", conn)
+    calories['Hour'] = pd.to_datetime(calories['ActivityHour']).dt.hour
+    calories['Block'] = pd.cut(
+        calories['Hour'], 
+        bins=[0,4,8,12,16,20,24],
+        labels=['0 – 4','4 – 8','8 – 12','12 – 16','16 – 20','20 – 24'],
+        right=False
+    )
+    avgCaloriesBlock = calories.groupby('Block')['Calories'].mean().reset_index(name='AverageCalories')
+
+    sleepDF = pd.read_sql_query("SELECT * FROM minute_sleep;", conn)
+    conn.close()
+    sleepDF['Hour'] = pd.to_datetime(sleepDF['date']).dt.hour
+    sleepDF['Block'] = pd.cut(
+        sleepDF['Hour'], 
+        bins=[0,4,8,12,16,20,24],
+        labels=['0 – 4','4 – 8','8 – 12','12 – 16','16 – 20','20 – 24'],
+        right=False
+    )
+    avgSleepBlock = sleepDF.groupby('Block').size().reset_index(name='TotalMinutes')
+    num_part = sleepDF['Id'].nunique()
+    avgSleepBlock['AverageSleepMinutes'] = avgSleepBlock['TotalMinutes'] / num_part
+
+    colA, colB, colC = st.columns(3)
+    with colA:
+        figA, axA = plt.subplots(figsize=(3,2.5))
+        axA.bar(avgStepsBlock['Block'], avgStepsBlock['AverageSteps'], color='#00B5B8')
+        axA.set_title("Avg Steps per 4h Block", fontsize=10)
+        axA.set_xlabel("4h block", fontsize=8)
+        axA.set_ylabel("Steps", fontsize=8)
+        axA.tick_params(axis='x', labelsize=8)
+        axA.tick_params(axis='y', labelsize=8)
+        plt.tight_layout()
+        st.pyplot(figA)
+
+    with colB:
+        figB, axB = plt.subplots(figsize=(3,2.5))
+        axB.bar(avgCaloriesBlock['Block'], avgCaloriesBlock['AverageCalories'], color='#00B5B8')
+        axB.set_title("Avg Calories per 4h Block", fontsize=10)
+        axB.set_xlabel("4h block", fontsize=8)
+        axB.set_ylabel("kcal", fontsize=8)
+        axB.tick_params(axis='x', labelsize=8)
+        axB.tick_params(axis='y', labelsize=8)
+        plt.tight_layout()
+        st.pyplot(figB)
+
+    with colC:
+        figC, axC = plt.subplots(figsize=(3,2.5))
+        axC.bar(avgSleepBlock['Block'], avgSleepBlock['AverageSleepMinutes'], color='#00B5B8')
+        axC.set_title("Avg Sleep per 4h Block", fontsize=10)
+        axC.set_xlabel("4h block", fontsize=8)
+        axC.set_ylabel("Minutes", fontsize=8)
+        axC.tick_params(axis='x', labelsize=8)
+        axC.tick_params(axis='y', labelsize=8)
+        plt.tight_layout()
+        st.pyplot(figC)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    counts = activity["Id"].value_counts()
+    def classify(count):
+        if count <= 10:
+            return "Light"
+        elif count <= 15:
+            return "Moderate"
+        else:
+            return "Heavy"
+    classifications = counts.apply(classify)
+    classification_counts = classifications.value_counts()
+
+    fig_pie, ax_pie = plt.subplots(figsize=(3,3))
+    ax_pie.pie(
+        classification_counts, 
+        labels=classification_counts.index, 
+        autopct="%1.1f%%", 
+        colors=['#00B5B8', '#66c2a5', '#3288bd'],
+        startangle=140
+    )
+    ax_pie.set_title("User Activity Classification", fontsize=10)
+    plt.tight_layout()
+    st.pyplot(fig_pie)
+
 
 if selected == "Individual Stats":
     import matplotlib.pyplot as plt

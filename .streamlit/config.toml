@@ -1,5 +1,5 @@
 [theme]
-primaryColor = "#00B5B8"  # Teal blue (Fitbit's brand color)
-backgroundColor = "#E0E7EC"  # Light grey background
-secondaryBackgroundColor = "#b0a599"  # Slightly darker for content containers
-textColor = "#002a3a"  # Dark grey/black for contrast
+primaryColor = "#00B5B8"
+backgroundColor = "#E0E7EC"
+secondaryBackgroundColor = "#b0a599"
+textColor = "#002a3a"
