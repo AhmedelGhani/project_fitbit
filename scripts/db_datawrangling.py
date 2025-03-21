@@ -1,3 +1,4 @@
+
 import sqlite3
 from matplotlib import pyplot as plt
 import pandas as pd
@@ -47,3 +48,4 @@ def mergingtables(table1, table2, time_column1=None, time_column2=None):
     return merged
 
 pd.set_option('display.float_format', '{:.0f}'.format)
+

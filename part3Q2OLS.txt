@@ -1,0 +1,27 @@
+Part 3.2: Sleep minutes vs Total Active Minutes
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:           SleepMinutes   R-squared:                       0.011
+Model:                            OLS   Adj. R-squared:                  0.006
+Method:                 Least Squares   F-statistic:                     2.247
+Date:                Fri, 21 Mar 2025   Prob (F-statistic):              0.135
+Time:                        15:48:27   Log-Likelihood:                -1279.3
+No. Observations:                 199   AIC:                             2563.
+Df Residuals:                     197   BIC:                             2569.
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+======================================================================================
+                         coef    std err          t      P>|t|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+const                469.2557     28.227     16.624      0.000     413.589     524.923
+TotalActiveMinutes    -0.1583      0.106     -1.499      0.135      -0.367       0.050
+==============================================================================
+Omnibus:                       20.511   Durbin-Watson:                   1.602
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               40.221
+Skew:                          -0.503   Prob(JB):                     1.85e-09
+Kurtosis:                       4.959   Cond. No.                         707.
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
