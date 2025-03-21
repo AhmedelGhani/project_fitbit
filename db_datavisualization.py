@@ -7,6 +7,7 @@ import numpy as np
 import seaborn as sns
 from scipy.stats import linregress
 
+#Function for numeric summary statistics (median, sum, mean, etc.)
 def numeric_summary(df, ids = None, columns=None, start_date = None, end_date = None, start_time = None, end_time = None):
     if 'Id' in df.index.names:
         df = df.reset_index()
@@ -52,6 +53,7 @@ def numeric_summary(df, ids = None, columns=None, start_date = None, end_date = 
     grouped_stats = df.groupby('Id')[columns].agg(['mean', 'std', 'min', Q1, 'median', Q3, 'max', IQR, 'count', 'sum'])
     return grouped_stats
 
+# Function for scatter plot between two columns for correlation
 def scatter_plot(df, xcol, ycol, ids= None, start_date = None, end_date = None, start_time = None, end_time = None):
     
     if 'Id' in df.index.names:
@@ -101,6 +103,7 @@ def scatter_plot(df, xcol, ycol, ids= None, start_date = None, end_date = None, 
     plt.grid(True)
     plt.show()
 
+#Function for boxplot for one or multiple ids based on one column
 def box_plot (df, ids = None, columns = None, start_date = None, end_date = None, start_time = None, end_time = None, ):
     
     if 'Id' in df.index.names:
@@ -149,6 +152,7 @@ def box_plot (df, ids = None, columns = None, start_date = None, end_date = None
     plt.tight_layout()
     plt.show()
 
+#Time Series Plot between two columns, scaled to each other via the y-axis
 def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, start_time=None, end_time=None, time_intervals = None):
     if 'Id' in df.index.names:
         df = df.reset_index()
@@ -188,31 +192,38 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
     if n_ids == 1:
         axes = [axes]
     
+    def rename_label(col):
+        if col == 'Value':
+            return 'Heart Rate'
+        elif col == 'value':
+            return 'Sleep Duration'
+        return col
+    
+    col1_label = rename_label(col1)
+    col2_label = rename_label(col2)
+
     for ax, uid in zip(axes, unique_ids):
         df_uid = df[df['Id'] == uid].sort_values(by='timestamp')
         ax2 = ax.twinx()
 
-        ax.plot(df_uid['timestamp'], df_uid[col1], color = 'red', label=col1)
-        ax.set_ylabel(col1, color = 'red')
+        ax.plot(df_uid['timestamp'], df_uid[col1], color = 'red', label=col1_label)
+        ax.set_ylabel(col1_label, color = 'red')
         ax.tick_params(axis='y', labelcolor = 'red')
 
-        ax2.plot(df_uid['timestamp'], df_uid[col2], color = 'blue', label=col2, marker = 'o')
-        ax2.set_ylabel(col2, color = 'blue')
+        ax2.plot(df_uid['timestamp'], df_uid[col2], color = 'blue', label=col2_label, marker = 'o')
+        ax2.set_ylabel(col2_label, color = 'blue')
         ax2.tick_params(axis='y', labelcolor = 'blue')
+
+        lines, labels = ax.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax.legend(lines + lines2, labels + labels2, loc='upper right')
 
         start_str = df_uid['timestamp'].dt.date.min().strftime('%Y-%m-%d') if not df_uid.empty else ''
         end_str = df_uid['timestamp'].dt.date.max().strftime('%Y-%m-%d') if not df_uid.empty else ''
         ax.set_title(f"{col1} and {col2} for Id {uid} on {start_str} and {end_str}")
         
         ax.set_xlabel("Time")
-        ax.legend()
+ 
     
     plt.tight_layout()
     plt.show()
-
-
-numeric_summary = numeric_summary (merged_data,  None, ['Value', 'TotalIntensity'], None, None, None, None)
-print (numeric_summary)
-scatter_plot(merged_data, 'Value', 'TotalIntensity', None, None, None, None, None)
-box_plot(merged_data, 6962181067, 'Value', None, None, None, None)
-timeseries_plot(merged_data, 'Value', 'TotalIntensity', 6962181067, '3/30/2016', '3/31/2016', None, None, '60min')

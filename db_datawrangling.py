@@ -46,8 +46,4 @@ def mergingtables(table1, table2, time_column1=None, time_column2=None):
     connection.close()
     return merged
 
-conn = sqlite3.connect('fitbit_database.db')
-
 pd.set_option('display.float_format', '{:.0f}'.format)
-merged_data = mergingtables('heart_rate', 'hourly_intensity', 'Time', 'ActivityHour')
-print(merged_data)
