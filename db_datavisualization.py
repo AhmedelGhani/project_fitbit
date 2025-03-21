@@ -6,14 +6,11 @@ import numpy as np
 import seaborn as sns
 from scipy.stats import linregress
 
-def numeric_summary(df, datetime_col, ids = None, columns=None, start_date = None, end_date = None, start_time = None, end_time = None):
+def numeric_summary(df, ids = None, columns=None, start_date = None, end_date = None, start_time = None, end_time = None):
     if 'Id' in df.index.names:
         df = df.reset_index()
         
-    if datetime_col is None:
-        print("Please provide a valid datetime column name.")
-    
-    df['timestamp'] = pd.to_datetime (df[datetime_col], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
+    df['timestamp'] = pd.to_datetime (df['Date/Time'], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
     
     if start_date is not None:
             start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
@@ -54,15 +51,12 @@ def numeric_summary(df, datetime_col, ids = None, columns=None, start_date = Non
     grouped_stats = df.groupby('Id')[columns].agg(['mean', 'std', 'min', Q1, 'median', Q3, 'max', IQR, 'count'])
     return grouped_stats
 
-def scatter_plot(df, xcol, ycol, datetime_col, ids= None, start_date = None, end_date = None, start_time = None, end_time = None):
+def scatter_plot(df, xcol, ycol, ids= None, start_date = None, end_date = None, start_time = None, end_time = None):
     
     if 'Id' in df.index.names:
         df = df.reset_index()
         
-    if datetime_col is None:
-        print("Please provide a valid datetime column name.")
-    
-    df['timestamp'] = pd.to_datetime (df[datetime_col], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
+    df['timestamp'] = pd.to_datetime (df['Date/Time'], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
     
     if start_date is not None:
             start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
@@ -106,15 +100,12 @@ def scatter_plot(df, xcol, ycol, datetime_col, ids= None, start_date = None, end
     plt.grid(True)
     plt.show()
 
-def box_plot (df, datetime_col, ids = None, columns = None, start_date = None, end_date = None, start_time = None, end_time = None, ):
+def box_plot (df, ids = None, columns = None, start_date = None, end_date = None, start_time = None, end_time = None, ):
     
     if 'Id' in df.index.names:
         df = df.reset_index()
         
-    if datetime_col is None:
-        print("Please provide a valid datetime column name.")
-    
-    df['timestamp'] = pd.to_datetime (df[datetime_col], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
+    df['timestamp'] = pd.to_datetime (df['Date/Time'], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
     
     if start_date is not None:
             start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
@@ -157,14 +148,11 @@ def box_plot (df, datetime_col, ids = None, columns = None, start_date = None, e
     plt.tight_layout()
     plt.show()
 
-def timeseries_plot(df, col1, col2, datetime_col, ids = None, start_date=None, end_date=None, start_time=None, end_time=None, time_intervals = None):
+def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, start_time=None, end_time=None, time_intervals = None):
     if 'Id' in df.index.names:
         df = df.reset_index()
-        
-    if datetime_col is None:
-        print("Please provide a valid datetime column name.")
     
-    df['timestamp'] = pd.to_datetime (df[datetime_col], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
+    df['timestamp'] = pd.to_datetime (df['Date/Time'], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
     
     if start_date is not None:
             start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
@@ -201,15 +189,15 @@ def timeseries_plot(df, col1, col2, datetime_col, ids = None, start_date=None, e
     
     for ax, uid in zip(axes, unique_ids):
         df_uid = df[df['Id'] == uid].sort_values(by='timestamp')
-        
         ax2 = ax.twinx()
-        ax.plot(df_uid['timestamp'], df_uid[col1], color = 'red', label=col1, marker = 'o')
+
+        ax.plot(df_uid['timestamp'], df_uid[col1], color = 'red', label=col1)
         ax.set_ylabel(col1, color = 'red')
         ax.tick_params(axis='y', labelcolor = 'red')
 
-        ax.plot(df_uid['timestamp'], df_uid[col2], color = 'blue', label=col2, marker = 'o')
-        ax.set_ylabel(col2, color = 'blue')
-        ax.tick_params(axis='y', labelcolor = 'blue')
+        ax2.plot(df_uid['timestamp'], df_uid[col2], color = 'blue', label=col2, marker = 'o')
+        ax2.set_ylabel(col2, color = 'blue')
+        ax2.tick_params(axis='y', labelcolor = 'blue')
 
         start_str = df_uid['timestamp'].dt.date.min().strftime('%Y-%m-%d') if not df_uid.empty else ''
         end_str = df_uid['timestamp'].dt.date.max().strftime('%Y-%m-%d') if not df_uid.empty else ''
@@ -223,8 +211,8 @@ def timeseries_plot(df, col1, col2, datetime_col, ids = None, start_date=None, e
 
 
 #print(merged_data.columns)
-numeric_summary = numeric_summary (merged_data, 'ActivityHour', None, ['StepTotal', 'value'], None, None, None, None)
+numeric_summary = numeric_summary (merged_data,  None, ['Value', 'TotalIntensity'], None, None, None, None)
 print (numeric_summary)
-scatter_plot(merged_data, 'StepTotal', 'value', 'ActivityHour', None, None, None, None, None)
-box_plot(merged_data, 'ActivityHour', 6962181067, 'value', None, None, None, None)
-timeseries_plot(merged_data, 'value', 'StepTotal', 'ActivityHour', 6962181067, None, None, None, None, '2D')
+scatter_plot(merged_data, 'Value', 'TotalIntensity', None, None, None, None, None)
+box_plot(merged_data, 6962181067, 'Value', None, None, None, None)
+timeseries_plot(merged_data, 'Value', 'TotalIntensity', 6962181067, '3/30/2016', '3/31/2016', None, None, '60min')
