@@ -49,3 +49,22 @@ def mergingtables(table1, table2, time_column1=None, time_column2=None):
 
 pd.set_option('display.float_format', '{:.0f}'.format)
 
+def get_daily_sleep_minutes():
+    """
+    Returns total sleep minutes per day per user (grouped by Id + Date).
+    """
+    conn = sqlite3.connect('fitbit_database.db')
+    sleep_df = pd.read_sql_query("SELECT * FROM minute_sleep", conn)
+    conn.close()
+
+    sleep_df['timestamp'] = pd.to_datetime(sleep_df['date'], errors='coerce')
+    sleep_df['Date'] = sleep_df['timestamp'].dt.date
+
+    daily_sleep = sleep_df.groupby(['Id', 'Date']).size().reset_index(name='SleepMinutes')
+    daily_sleep['Date'] = pd.to_datetime(daily_sleep['Date'])  
+
+    return daily_sleep
+
+sleep_minutes = get_daily_sleep_minutes
+print(sleep_minutes)
+print(mergingtables("weight_log", 'hourly_steps', 'Date', 'ActivityHour'))
