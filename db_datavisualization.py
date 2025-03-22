@@ -1,4 +1,4 @@
-from scripts.db_datawrangling import mergingtables, merged_data
+from scripts.db_datawrangling import mergingtables, get_daily_sleep_minutes
 import sqlite3
 from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
@@ -154,23 +154,21 @@ def box_plot (df, ids = None, columns = None, start_date = None, end_date = None
 
 #Time Series Plot between two columns, scaled to each other via the y-axis
 def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, start_time=None, end_time=None, time_intervals = None):
-    if 'Id' in df.index.names:
-        df = df.reset_index()
     
-    df['timestamp'] = pd.to_datetime (df['Date/Time'], format='%m/%d/%Y %I:%M:%S %p', errors='coerce')
+    df['timestamp'] = pd.to_datetime (df['Date/Time'], errors='coerce')
     
     if start_date is not None:
-            start_date = pd.to_datetime(start_date, format = '%m/%d/%Y')
-            df = df[df['timestamp'] >= start_date]
+        start_date = pd.to_datetime(start_date)
+        df = df[df['timestamp'] >= start_date]
     if end_date is not None:
-            end_date = pd.to_datetime(end_date, format = '%m/%d/%Y') + pd.Timedelta(days=1)
-            df = df[df['timestamp'] < end_date]
+        end_date = pd.to_datetime(end_date) + pd.Timedelta(days=1)
+        df = df[df['timestamp'] < end_date]
     
     if start_time is not None:
-        start_time = pd.to_datetime(start_time, format = '%I:%M:%S %p').time()
+        start_time = pd.to_datetime(start_time).time()
         df = df[df['timestamp'].dt.time >= start_time]
     if end_time is not None:
-        end_time = pd.to_datetime(end_time, format = '%I:%M:%S %p').time()
+        end_time = pd.to_datetime(end_time).time()
         df = df[df['timestamp'].dt.time <= end_time]
     
     if ids is not None:
@@ -181,14 +179,13 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
     if time_intervals is not None:
         df_copy = df.copy()
         df_copy.set_index('timestamp', inplace=True)       
-        df_copy = df_copy.groupby('Id').resample(time_intervals)[[col1, col2]].mean()
+        df_copy = df_copy.groupby('Id').resample(time_intervals)[[col1, col2]].sum()
         df_copy.reset_index(inplace=True)
         df = df_copy
 
     unique_ids = df['Id'].unique()
     n_ids = len(unique_ids)
     fig, axes = plt.subplots(n_ids, 1, figsize=(12, 5 * n_ids), sharex=True)
-
     if n_ids == 1:
         axes = [axes]
     
@@ -227,3 +224,7 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
     
     plt.tight_layout()
     plt.show()
+
+sleep_minutes = get_daily_sleep_minutes()
+merged_data = mergingtables(sleep_minutes, 'hourly_steps', 'Date', 'ActivityHour')
+timeseries_plot(merged_data, 'SleepMinutes', 'StepTotal', 1503960366, '3/31/2016', '4/05/2016', None, None, '1D')
