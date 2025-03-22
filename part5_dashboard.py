@@ -512,7 +512,7 @@ if selected == "Individual Stats":
 elif selected == "Sleep Analysis":
     st.title("Sleep Duration Analysis")
     st.markdown("This page will contain sleep duration statistics and visualizations (to be implemented next).")
-    
+
     st.sidebar.header("Select Individual ID")
     unique_ids = activity["Id"].unique()
     selected_id = st.sidebar.selectbox("Choose an ID to view individual statistics", unique_ids)
@@ -534,7 +534,24 @@ elif selected == "Sleep Analysis":
         start_date = end_date = pd.to_datetime(selected_dates)
 
     individual_data = activity[activity["Id"] == selected_id].copy()
-    individual_data = individual_data[
-        (individual_data["ActivityDate"] >= start_date) &
-        (individual_data["ActivityDate"] <= end_date)
-    ]
+    individual_data = individual_data[(individual_data["ActivityDate"] >= start_date) &(individual_data["ActivityDate"] <= end_date)]
+
+    st.sidebar.header("Compare Sleep With")
+
+metric_options = {
+    "Steps": "TotalSteps",
+    "Distance": "TotalDistance",
+    "Active Minutes": "TotalActiveMinutes",
+    "Sedentary Minutes": "SedentaryMinutes",
+    "Calories": "Calories",
+    "Intensity": "TotalIntensity"
+}
+
+selected_metric_label = st.sidebar.selectbox(
+    "Choose a metric to compare against Sleep",
+    options=list(metric_options.keys()),
+    index=0  
+)
+
+selected_metric = metric_options[selected_metric_label]
+
