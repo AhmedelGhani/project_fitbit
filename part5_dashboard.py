@@ -516,12 +516,8 @@ elif selected == "Sleep Analysis":
     st.title("Sleep Duration Analysis")
 
     min_date, max_date = activity["ActivityDate"].min(), activity["ActivityDate"].max()
-    selected_dates = st.sidebar.date_input(
-        "Filter by date range",
-        value=(min_date, max_date),
-        min_value=min_date,
-        max_value=max_date
-    )
+    selected_dates = st.sidebar.date_input("Filter by date range", value=(min_date, max_date),
+        min_value=min_date, max_value=max_date)
 
     if isinstance(selected_dates, (tuple, list)):
         if len(selected_dates) == 2:
@@ -548,31 +544,42 @@ elif selected == "Sleep Analysis":
     )
     selected_metric = metric_options[selected_metric_label]
 
-    activity_filtered = activity.copy()
-    activity_filtered["ActivityDate"] = pd.to_datetime(activity_filtered["ActivityDate"])
-    activity_filtered = activity_filtered[(activity_filtered["ActivityDate"] >= start_date) & (activity_filtered["ActivityDate"] <= end_date) &
-    (activity_filtered[selected_metric] > 0)]
+    if selected_metric_label == "Active Minutes":
+        active_minutes = get_hourly_active_minutes()
+        active_minutes.rename(columns={"Date": "ActivityDate", "ActiveMinutes": "TotalActiveMinutes"}, inplace=True)
+        active_minutes["ActivityDate"] = pd.to_datetime(active_minutes["ActivityDate"])
+        activity_filtered = active_minutes[(active_minutes["ActivityDate"] >= start_date) &
+            (active_minutes["ActivityDate"] <= end_date) ].copy()
+    else:  
+        activity_filtered = activity.copy()
+        activity_filtered["ActivityDate"] = pd.to_datetime(activity_filtered["ActivityDate"])
+        activity_filtered = activity_filtered[(activity_filtered["ActivityDate"] >= start_date) & (activity_filtered["ActivityDate"] <= end_date) &
+        (activity_filtered[selected_metric] > 0)].copy()
+
+    if selected_metric in activity_filtered.columns:
+        activity_filtered = activity_filtered[activity_filtered[selected_metric].notna()]
 
     sleep_df = get_daily_sleep_minutes()
     sleep_df["Date"] = pd.to_datetime(sleep_df["Date"])
-    sleep_df = sleep_df[(sleep_df["Date"] >= start_date) & (sleep_df["Date"] <= end_date)]
+    sleep_data_filtered = sleep_df[(sleep_df["Date"] >= start_date) & (sleep_df["Date"] <= end_date)].copy()
 
+    candidate_ids = np.intersect1d(activity_filtered["Id"].unique(), sleep_data_filtered["Id"].unique())
     valid_ids = []
-    for uid in activity_filtered["Id"].unique():
+    for uid in candidate_ids:
         indiv_activity = activity_filtered[activity_filtered["Id"] == uid].copy()
-        indiv_sleep = sleep_df[sleep_df["Id"] == uid].copy()
+        indiv_sleep = sleep_data_filtered[sleep_data_filtered["Id"] == uid].copy()
         merged = mergingtables(indiv_activity, indiv_sleep, "ActivityDate", "Date")
-        merged = merged[ (merged["Date/Time"] >= start_date.floor("D")) & (merged["Date/Time"] <= end_date.floor("D"))]
-        if "SleepMinutes" in merged.columns and (merged["SleepMinutes"] > 0).any():
+        merged = merged[(merged["Date/Time"] >= start_date.floor("D")) & (merged["Date/Time"] <= end_date.floor("D"))]
+        if not merged.empty and merged["SleepMinutes"].sum() > 0:
             valid_ids.append(uid)
-
+            
     st.sidebar.header("Select Individual ID")
     selected_id = st.sidebar.selectbox("Choose an ID to view individual statistics", valid_ids)
 
-    indiv_activity = activity_filtered[activity_filtered["Id"] == selected_id].copy()
-    indiv_sleep = sleep_df[sleep_df["Id"] == selected_id].copy()
+    individual_data = activity_filtered[activity_filtered["Id"] == selected_id].copy()
+    sleep_data_id = sleep_data_filtered[sleep_data_filtered["Id"] == selected_id].copy()
 
-    merged_data = mergingtables(indiv_activity, indiv_sleep, "ActivityDate", "Date")
+    merged_data = mergingtables(individual_data, sleep_data_id, "ActivityDate", "Date")
     merged_data = merged_data[(merged_data["Date/Time"] >= start_date.floor("D")) & (merged_data["Date/Time"] <= end_date.floor("D"))]
 
     if merged_data.empty:
