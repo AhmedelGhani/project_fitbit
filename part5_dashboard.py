@@ -510,6 +510,8 @@ if selected == "Individual Stats":
 
 
 elif selected == "Sleep Analysis":
+    from scripts.db_datawrangling import mergingtables, get_daily_sleep_minutes, get_hourly_active_minutes
+    from db_datavisualization import timeseries_plot
     st.title("Sleep Duration Analysis")
     st.markdown("This page will contain sleep duration statistics and visualizations (to be implemented next).")
 
@@ -552,12 +554,15 @@ elif selected == "Sleep Analysis":
     options=list(metric_options.keys()),
     index=0  
     )
-
     selected_metric = metric_options[selected_metric_label]
 
-    metric_table_map = {
-    "TotalSteps": "daily_activity",
-    "TotalDistance": "daily_activity"
-    "Calories": "hourly_calories",
-    "TotalIntensity": "hourly_intensity",
-}
+    sleep_data = get_daily_sleep_minutes()
+    sleep_data["Date"] = pd.to_datetime(sleep_data["Date"])
+    sleep_data = sleep_data[sleep_data["Id"] == selected_id]
+
+    merged_data = mergingtables(individual_data, sleep_data, time_column1="ActivityDate", time_column2="Date")
+    merged_data = merged_data[(merged_data["Date/Time"] >= start_date.floor('D')) & (merged_data["Date/Time"] <= end_date.floor('D'))]
+
+    st.subheader(f"{selected_metric_label} vs Sleep Duration Over Time")
+    fig = timeseries_plot(merged_data, selected_metric, "SleepMinutes")
+    st.pyplot(fig)

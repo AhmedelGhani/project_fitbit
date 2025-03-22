@@ -223,8 +223,4 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
  
     
     plt.tight_layout()
-    plt.show()
-
-active_minutes = get_hourly_active_minutes()
-merged_data = mergingtables(active_minutes, 'hourly_steps', 'Date', 'ActivityHour')
-timeseries_plot(merged_data, 'ActiveMinutes', 'StepTotal', 1503960366, '3/31/2016', '4/05/2016', None, None, '1D')
+    return fig
