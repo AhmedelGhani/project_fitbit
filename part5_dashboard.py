@@ -510,14 +510,10 @@ if selected == "Individual Stats":
 
 
 elif selected == "Sleep Analysis":
+    import numpy as np
     from scripts.db_datawrangling import mergingtables, get_daily_sleep_minutes, get_hourly_active_minutes
     from db_datavisualization import timeseries_plot
     st.title("Sleep Duration Analysis")
-    st.markdown("This page will contain sleep duration statistics and visualizations (to be implemented next).")
-
-    st.sidebar.header("Select Individual ID")
-    unique_ids = activity["Id"].unique()
-    selected_id = st.sidebar.selectbox("Choose an ID to view individual statistics", unique_ids)
 
     min_date, max_date = activity["ActivityDate"].min(), activity["ActivityDate"].max()
     selected_dates = st.sidebar.date_input(
@@ -535,11 +531,7 @@ elif selected == "Sleep Analysis":
     else:
         start_date = end_date = pd.to_datetime(selected_dates)
 
-    individual_data = activity[activity["Id"] == selected_id].copy()
-    individual_data = individual_data[(individual_data["ActivityDate"] >= start_date) &(individual_data["ActivityDate"] <= end_date)]
-
     st.sidebar.header("Select A Metric")
-
     metric_options = {
     "Steps": "TotalSteps",
     "Distance": "TotalDistance",
@@ -556,13 +548,36 @@ elif selected == "Sleep Analysis":
     )
     selected_metric = metric_options[selected_metric_label]
 
-    sleep_data = get_daily_sleep_minutes()
-    sleep_data["Date"] = pd.to_datetime(sleep_data["Date"])
-    sleep_data = sleep_data[sleep_data["Id"] == selected_id]
+    activity_filtered = activity.copy()
+    activity_filtered["ActivityDate"] = pd.to_datetime(activity_filtered["ActivityDate"])
+    activity_filtered = activity_filtered[(activity_filtered["ActivityDate"] >= start_date) & (activity_filtered["ActivityDate"] <= end_date) &
+    (activity_filtered[selected_metric] > 0)]
 
-    merged_data = mergingtables(individual_data, sleep_data, time_column1="ActivityDate", time_column2="Date")
-    merged_data = merged_data[(merged_data["Date/Time"] >= start_date.floor('D')) & (merged_data["Date/Time"] <= end_date.floor('D'))]
+    sleep_df = get_daily_sleep_minutes()
+    sleep_df["Date"] = pd.to_datetime(sleep_df["Date"])
+    sleep_df = sleep_df[(sleep_df["Date"] >= start_date) & (sleep_df["Date"] <= end_date)]
 
-    st.subheader(f"{selected_metric_label} vs Sleep Duration Over Time")
-    fig = timeseries_plot(merged_data, selected_metric, "SleepMinutes")
-    st.pyplot(fig)
+    valid_ids = []
+    for uid in activity_filtered["Id"].unique():
+        indiv_activity = activity_filtered[activity_filtered["Id"] == uid].copy()
+        indiv_sleep = sleep_df[sleep_df["Id"] == uid].copy()
+        merged = mergingtables(indiv_activity, indiv_sleep, "ActivityDate", "Date")
+        merged = merged[ (merged["Date/Time"] >= start_date.floor("D")) & (merged["Date/Time"] <= end_date.floor("D"))]
+        if "SleepMinutes" in merged.columns and (merged["SleepMinutes"] > 0).any():
+            valid_ids.append(uid)
+
+    st.sidebar.header("Select Individual ID")
+    selected_id = st.sidebar.selectbox("Choose an ID to view individual statistics", valid_ids)
+
+    indiv_activity = activity_filtered[activity_filtered["Id"] == selected_id].copy()
+    indiv_sleep = sleep_df[sleep_df["Id"] == selected_id].copy()
+
+    merged_data = mergingtables(indiv_activity, indiv_sleep, "ActivityDate", "Date")
+    merged_data = merged_data[(merged_data["Date/Time"] >= start_date.floor("D")) & (merged_data["Date/Time"] <= end_date.floor("D"))]
+
+    if merged_data.empty:
+        st.error("No data can be displayed during the given dateframe, please extend your date length.")
+    else:
+        st.subheader(f"{selected_metric_label} vs Sleep Duration Over Time")
+        fig = timeseries_plot(merged_data, selected_metric, "SleepMinutes")
+        st.pyplot(fig)
