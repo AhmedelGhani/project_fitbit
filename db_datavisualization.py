@@ -1,4 +1,4 @@
-from scripts.db_datawrangling import mergingtables, get_daily_sleep_minutes
+from scripts.db_datawrangling import mergingtables, get_daily_sleep_minutes, get_hourly_active_minutes
 import sqlite3
 from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
@@ -225,6 +225,6 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
     plt.tight_layout()
     plt.show()
 
-sleep_minutes = get_daily_sleep_minutes()
-merged_data = mergingtables(sleep_minutes, 'hourly_steps', 'Date', 'ActivityHour')
-timeseries_plot(merged_data, 'SleepMinutes', 'StepTotal', 1503960366, '3/31/2016', '4/05/2016', None, None, '1D')
+active_minutes = get_hourly_active_minutes()
+merged_data = mergingtables(active_minutes, 'hourly_steps', 'Date', 'ActivityHour')
+timeseries_plot(merged_data, 'ActiveMinutes', 'StepTotal', 1503960366, '3/31/2016', '4/05/2016', None, None, '1D')

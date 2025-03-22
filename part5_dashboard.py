@@ -548,26 +548,16 @@ elif selected == "Sleep Analysis":
     }
 
     selected_metric_label = st.sidebar.selectbox(
-    "Choose a metric to compare against Sleep Duration with a dual y-axis graph",
+    "Choose a metric to compare graphically against Sleep Duration.",
     options=list(metric_options.keys()),
     index=0  
     )
 
     selected_metric = metric_options[selected_metric_label]
 
-    st.sidebar.header("Correlation Analysis")
-
-    correlation_options = {
-    "Steps": "TotalSteps",
-    "Distance": "TotalDistance",
-    "Active Minutes": "TotalActiveMinutes",
-    "Sedentary Minutes": "SedentaryMinutes",
-    "Calories": "Calories",
-    "Intensity": "TotalIntensity",
-    }
-
-    selected_corr_label = st.sidebar.selectbox(
-    "Select a metric to check correlation with Sleep Duration",
-    options=list(correlation_options.keys()),
-    index=0
-    )
+    metric_table_map = {
+    "TotalSteps": "daily_activity",
+    "TotalDistance": "daily_activity"
+    "Calories": "hourly_calories",
+    "TotalIntensity": "hourly_intensity",
+}

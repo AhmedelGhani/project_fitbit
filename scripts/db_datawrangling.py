@@ -64,3 +64,17 @@ def get_daily_sleep_minutes():
     hourly_sleep = (sleep_df.groupby(['Id', 'Date']).size().reset_index(name='SleepMinutes'))
 
     return hourly_sleep
+
+def get_hourly_active_minutes():
+    connection = sqlite3.connect('fitbit_database.db')
+    df = pd.read_sql_query("SELECT * FROM daily_activity", connection)
+    connection.close()
+
+    df['timestamp'] = pd.to_datetime(df['ActivityDate'], errors='coerce')
+    df['Date'] = df['timestamp'].dt.floor('H')
+
+    df['ActiveMinutes'] = (df['VeryActiveMinutes'] + df['FairlyActiveMinutes'] + df['LightlyActiveMinutes'])
+
+    hourly_active = (df.groupby(['Id', 'Date'])['ActiveMinutes'].sum().reset_index(name='ActiveMinutes'))
+
+    return hourly_active
