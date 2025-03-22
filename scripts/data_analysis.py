@@ -51,10 +51,12 @@ def plot_workout_frequency(df):
     plt.subplots_adjust(bottom=0.2)
     plt.show()
 
+
 def run_regression(df):
-    df["Id"] = df["Id"].astype('category')
-    model = smf.ols('Calories ~ TotalSteps + C(Id)', data=df).fit()
-    return model.summary()
+    X = sm.add_constant(df["TotalSteps"])
+    y = df["Calories"]
+    model = sm.OLS(y, X).fit()
+    return model
 
 def plot_regression_per_user(df, user_id):
     user_data = df[df['Id'] == user_id]
@@ -88,11 +90,21 @@ def plot_distance_over_time(df):
     plt.subplots_adjust(bottom=0.2, top=0.9)
     plt.show()
 
-def plot_distance_vs_calories(df):
-    #Creates a scatter plot showing the relationship between Total Distance and Calories Burned.#
-    plt.figure(figsize=(10, 5))
-    sns.scatterplot(x='TotalDistance', y='Calories', data=df, alpha=0.7)
-    plt.xlabel('Total Distance')
-    plt.ylabel('Calories Burned')
-    plt.title('Total Distance vs Calories Burned')
-    plt.show()
+def plot_distance_vs_calories(activity):
+    fig, ax = plt.subplots(figsize=(5, 3))
+    ax.scatter(activity["TotalDistance"], activity["Calories"], alpha=0.6, color="#007b82")
+    ax.set_title("Distance vs Calories")
+    ax.set_xlabel("Total Distance (km)")
+    ax.set_ylabel("Calories Burned")
+    ax.grid(True)
+    plt.tight_layout()
+    return fig
+
+def get_distance_vs_calories_plot(df):
+    fig, ax = plt.subplots(figsize=(5, 4))
+    ax.scatter(df["TotalDistance"], df["Calories"], color="#00B5B8", alpha=0.6)
+    ax.set_title("Distance vs Calories")
+    ax.set_xlabel("Total Distance (km)")
+    ax.set_ylabel("Calories Burned")
+    ax.grid(True, linestyle='--', alpha=0.3)
+    return fig
