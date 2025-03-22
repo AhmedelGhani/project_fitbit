@@ -512,3 +512,29 @@ if selected == "Individual Stats":
 elif selected == "Sleep Analysis":
     st.title("Sleep Duration Analysis")
     st.markdown("This page will contain sleep duration statistics and visualizations (to be implemented next).")
+    
+    st.sidebar.header("Select Individual ID")
+    unique_ids = activity["Id"].unique()
+    selected_id = st.sidebar.selectbox("Choose an ID to view individual statistics", unique_ids)
+
+    min_date, max_date = activity["ActivityDate"].min(), activity["ActivityDate"].max()
+    selected_dates = st.sidebar.date_input(
+        "Filter by date range",
+        value=(min_date, max_date),
+        min_value=min_date,
+        max_value=max_date
+    )
+
+    if isinstance(selected_dates, (tuple, list)):
+        if len(selected_dates) == 2:
+            start_date, end_date = pd.to_datetime(selected_dates[0]), pd.to_datetime(selected_dates[1])
+        else:
+            start_date = end_date = pd.to_datetime(selected_dates[0])
+    else:
+        start_date = end_date = pd.to_datetime(selected_dates)
+
+    individual_data = activity[activity["Id"] == selected_id].copy()
+    individual_data = individual_data[
+        (individual_data["ActivityDate"] >= start_date) &
+        (individual_data["ActivityDate"] <= end_date)
+    ]
