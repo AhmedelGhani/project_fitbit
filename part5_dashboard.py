@@ -511,6 +511,8 @@ if selected == "Individual Stats":
 
 elif selected == "Sleep Analysis":
     import numpy as np
+    import statsmodels.api as sm
+    import matplotlib.pyplot as plt
     from scripts.db_datawrangling import mergingtables, get_daily_sleep_minutes, get_hourly_active_minutes
     from db_datavisualization import timeseries_plot
     st.title("Sleep Duration Analysis")
@@ -580,3 +582,29 @@ elif selected == "Sleep Analysis":
         st.subheader(f"{selected_metric_label} vs. Sleep Duration Over Time (Dual Y-Axis Graph)")
         fig = timeseries_plot(final_data, selected_metric, "SleepMinutes")
         st.pyplot(fig)
+
+st.markdown("### Correlation Analysis")
+if final_data.empty or selected_metric not in final_data.columns:
+    st.error("Insufficient data for correlation analysis.")
+else:
+    final_data["SleepMinutes"] = final_data["SleepMinutes"].fillna(0)
+    df_corr = final_data[["SleepMinutes", selected_metric]].copy()
+    df_corr.dropna(subset=[selected_metric], inplace=True)
+    if df_corr.empty:
+        st.error("No valid data available for correlation analysis.")
+    else:
+        fig_corr, ax_corr = plt.subplots(figsize=(8, 4))
+        ax_corr.scatter(df_corr[selected_metric], df_corr["SleepMinutes"], color='#002a3a', alpha=0.7)
+        X_ols = sm.add_constant(df_corr[selected_metric])
+        model_ols = sm.OLS(df_corr["SleepMinutes"], X_ols).fit()
+        df_corr["pred"] = model_ols.predict(X_ols)
+        ax_corr.plot(df_corr[selected_metric], df_corr["pred"], color='red', linewidth=2)
+        ax_corr.set_xlabel(selected_metric_label)
+        ax_corr.set_ylabel("Sleep Duration")
+        st.pyplot(fig_corr)
+        st.markdown(
+            f"**Correlation Analysis:** "
+            f"R-squared: {model_ols.rsquared:.3f}, "
+            f"Slope: {model_ols.params[1]:.3f} "
+            f"(p-value: {model_ols.pvalues[1]:.3f})"
+        )
