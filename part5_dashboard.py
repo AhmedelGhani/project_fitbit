@@ -420,7 +420,7 @@ if selected == "Individual Stats":
         else:
             row = weight_data.iloc[0]
             weight_kg = row["WeightKg"] if pd.notna(row["WeightKg"]) else None
-            fat_pct = row["Fat"] if pd.notna(row["Fat"]) else None
+            fat_pct = row["Fat"] if "Fat" in row and pd.notna(row["Fat"]) else None
             bmi_val = row["BMI"] if pd.notna(row["BMI"]) else None
 
             col_w, col_f, col_b = st.columns(3)
@@ -531,12 +531,12 @@ elif selected == "Sleep Analysis":
 
     st.sidebar.header("Select A Metric")
     metric_options = {
-    "Steps": "TotalSteps",
-    "Distance": "TotalDistance",
+    "Total Steps": "TotalSteps",
+    "Total Distance": "TotalDistance",
     "Active Minutes": "TotalActiveMinutes",
     "Sedentary Minutes": "SedentaryMinutes",
-    "Calories": "Calories",
-    "Intensity": "TotalIntensity"
+    "Total Calories": "Calories",
+    "Total Intensity": "TotalIntensity"
     }
 
     selected_metric_label = st.sidebar.selectbox(
@@ -576,6 +576,7 @@ elif selected == "Sleep Analysis":
     selected_id = st.sidebar.selectbox("Choose an ID to view individual statistics", valid_ids)
 
     final_data = final_merged[final_merged["Id"] == selected_id]
+    st.markdown("### Correlation Analysis")
     if final_data.empty:
         st.error("No data can be displayed during the given dateframe, please extend your date length.")
     else:
@@ -583,41 +584,40 @@ elif selected == "Sleep Analysis":
         fig = timeseries_plot(final_data, selected_metric, "SleepMinutes")
         st.pyplot(fig)
 
-st.markdown("### Correlation Analysis")
-if final_data.empty or selected_metric not in final_data.columns:
-    st.error("Insufficient data for correlation analysis.")
-else:
-    final_data["SleepMinutes"] = final_data["SleepMinutes"].fillna(0)
-    df_corr = final_data[["SleepMinutes", selected_metric]].copy()
-    df_corr.dropna(subset=[selected_metric], inplace=True)
-    if df_corr.empty:
-        st.error("No valid data available for correlation analysis.")
-    else:
-        fig_corr, ax_corr = plt.subplots(figsize=(8, 4))
-        ax_corr.scatter(df_corr[selected_metric], df_corr["SleepMinutes"], color='#002a3a', alpha=0.7)
-        X_ols = sm.add_constant(df_corr[selected_metric])
-        model_ols = sm.OLS(df_corr["SleepMinutes"], X_ols).fit()
-        df_corr["pred"] = model_ols.predict(X_ols)
-        ax_corr.plot(df_corr[selected_metric], df_corr["pred"], color='red', linewidth=2)
-        ax_corr.set_xlabel(selected_metric_label)
-        ax_corr.set_ylabel("Sleep Duration")
-        st.pyplot(fig_corr)
+        if final_data.empty or selected_metric not in final_data.columns:
+            st.error("Insufficient data for correlation analysis.")
+        else:
+            final_data["SleepMinutes"] = final_data["SleepMinutes"].fillna(0)
+            df_corr = final_data[["SleepMinutes", selected_metric]].copy()
+            df_corr.dropna(subset=[selected_metric], inplace=True)
+        if df_corr.empty:
+            st.error("No valid data available for correlation analysis.")
+        else:
+            fig_corr, ax_corr = plt.subplots(figsize=(8, 4))
+            ax_corr.scatter(df_corr[selected_metric], df_corr["SleepMinutes"], color='#002a3a', alpha=0.7)
+            X_ols = sm.add_constant(df_corr[selected_metric])
+            model_ols = sm.OLS(df_corr["SleepMinutes"], X_ols).fit()
+            df_corr["pred"] = model_ols.predict(X_ols)
+            ax_corr.plot(df_corr[selected_metric], df_corr["pred"], color='red', linewidth=2)
+            ax_corr.set_xlabel(selected_metric_label)
+            ax_corr.set_ylabel("Sleep Duration")
+            st.pyplot(fig_corr)
         
-        st.markdown(
-    f"""
-    <div style="background-color: #002a3a; border-radius: 10px; 
+            st.markdown(
+            f"""
+            <div style="background-color: #002a3a; border-radius: 10px; 
                 padding: 15px; text-align: center; margin-top: 15px;">
-        <h4 style="color: white; margin: 0px;">OLS Summary</h4>
-        <p style="color: white; margin: 0px;">
+            <h4 style="color: white; margin: 0px;">OLS Summary</h4>
+            <p style="color: white; margin: 0px;">
             R-squared: {model_ols.rsquared:.3f}
-        </p>
-        <p style="color: white; margin: 0px;">
+            </p>
+            <p style="color: white; margin: 0px;">
             Intercept (p-value): {model_ols.params[0]:.3f} ({model_ols.pvalues[0]:.3f})
-        </p>
-        <p style="color: white; margin: 0px;">
+            </p>
+            <p style="color: white; margin: 0px;">
             Slope (p-value): {model_ols.params[1]:.3f} ({model_ols.pvalues[1]:.3f})
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+            </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+            )
