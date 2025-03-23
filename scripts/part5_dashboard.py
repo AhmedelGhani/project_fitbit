@@ -413,7 +413,7 @@ if selected == "Individual Stats":
         else:
             row = weight_data.iloc[0]
             weight_kg = row["WeightKg"] if pd.notna(row["WeightKg"]) else None
-            fat_pct = row["Fat"] if pd.notna(row["Fat"]) else None
+            fat_pct = row.get("Fat") if pd.notna(row.get("Fat")) else None
             bmi_val = row["BMI"] if pd.notna(row["BMI"]) else None
 
             col_w, col_f, col_b = st.columns(3)
@@ -503,5 +503,115 @@ if selected == "Individual Stats":
 
 
 elif selected == "Sleep Analysis":
+    import numpy as np
+    import statsmodels.api as sm
+    import matplotlib.pyplot as plt
+    from db_datawrangling import mergingtables, get_daily_sleep_minutes, get_hourly_active_minutes
+    from db_datavisualization import timeseries_plot
     st.title("Sleep Duration Analysis")
-    st.markdown("This page will contain sleep duration statistics and visualizations (to be implemented next).")
+
+    min_date, max_date = activity["ActivityDate"].min(), activity["ActivityDate"].max()
+    selected_dates = st.sidebar.date_input("Filter by date range", value=(min_date, max_date),
+        min_value=min_date, max_value=max_date)
+
+    if isinstance(selected_dates, (tuple, list)):
+        if len(selected_dates) == 2:
+            start_date, end_date = pd.to_datetime(selected_dates[0]), pd.to_datetime(selected_dates[1])
+        else:
+            start_date = end_date = pd.to_datetime(selected_dates[0])
+    else:
+        start_date = end_date = pd.to_datetime(selected_dates)
+
+    st.sidebar.header("Select A Metric")
+    metric_options = {
+    "Total Steps": "TotalSteps",
+    "Total Distance": "TotalDistance",
+    "Active Minutes": "TotalActiveMinutes",
+    "Sedentary Minutes": "SedentaryMinutes",
+    "Total Calories": "Calories",
+    "Total Intensity": "TotalIntensity"
+    }
+
+    selected_metric_label = st.sidebar.selectbox(
+    "Choose a metric to compare graphically against Sleep Duration.",
+    options=list(metric_options.keys()),
+    index=0  
+    )
+    selected_metric = metric_options[selected_metric_label]
+
+    if selected_metric_label == "Active Minutes":
+        active_minutes = get_hourly_active_minutes()
+        active_minutes.rename(columns={"Date": "ActivityHour", "ActiveMinutes": "TotalActiveMinutes"}, inplace=True)
+        merged_metric = mergingtables("daily_activity", active_minutes, time_column1="ActivityDate", time_column2="ActivityHour")
+    elif selected_metric_label == "Intensity":
+        merged_metric = mergingtables("daily_activity", "hourly_intensity", time_column1="ActivityDate", time_column2="ActivityHour")
+    else: 
+        merged_metric = activity.copy() 
+        merged_metric["ActivityDate"] = pd.to_datetime(merged_metric["ActivityDate"], errors="coerce")
+        merged_metric["Date/Time"] = merged_metric["ActivityDate"].dt.floor("D")
+
+    if selected_metric in merged_metric.columns:
+        merged_metric = merged_metric[merged_metric[selected_metric].notna()]
+
+    sleep_df = get_daily_sleep_minutes()
+    final_merged = mergingtables(merged_metric, sleep_df, time_column1="Date/Time", time_column2="Date")
+    final_merged = final_merged[(final_merged["Date/Time"] >= start_date.floor("D")) &
+        (final_merged["Date/Time"] <= end_date.floor("D"))].copy()
+
+    candidate_ids = final_merged["Id"].unique()
+    valid_ids = []
+    for uid in candidate_ids:
+        subset = final_merged[final_merged["Id"] == uid]
+        if not subset.empty and subset["SleepMinutes"].sum() > 0:
+            valid_ids.append(uid)
+
+    st.sidebar.header("Select Individual ID")
+    selected_id = st.sidebar.selectbox("Choose an ID to view individual statistics", valid_ids)
+
+    final_data = final_merged[final_merged["Id"] == selected_id]
+    if final_data.empty:
+        st.error("No data can be displayed during the given dateframe, please extend your date length.")
+    else:
+        st.subheader(f"{selected_metric_label} vs. Sleep Duration Over Time (Dual Y-Axis Graph)")
+        fig = timeseries_plot(final_data, selected_metric, "SleepMinutes")
+        st.pyplot(fig)
+
+    st.markdown("### Correlation Analysis")
+
+    if final_data.empty or selected_metric not in final_data.columns:
+        st.error("Insufficient data for correlation analysis.")
+    else:
+        final_data["SleepMinutes"] = final_data["SleepMinutes"].fillna(0)
+        df_corr = final_data[["SleepMinutes", selected_metric]].copy()
+        df_corr.dropna(subset=[selected_metric], inplace=True)
+        if df_corr.empty:
+            st.error("No valid data available for correlation analysis.")
+        else:
+            fig_corr, ax_corr = plt.subplots(figsize=(8, 4))
+            ax_corr.scatter(df_corr[selected_metric], df_corr["SleepMinutes"], color='#002a3a', alpha=0.7)
+            X_ols = sm.add_constant(df_corr[selected_metric])
+            model_ols = sm.OLS(df_corr["SleepMinutes"], X_ols).fit()
+            df_corr["pred"] = model_ols.predict(X_ols)
+            ax_corr.plot(df_corr[selected_metric], df_corr["pred"], color='red', linewidth=2)
+            ax_corr.set_xlabel(selected_metric_label)
+            ax_corr.set_ylabel("Sleep Duration")
+            st.pyplot(fig_corr)
+        
+            st.markdown(
+            f"""
+            <div style="background-color: #002a3a; border-radius: 10px; 
+                padding: 15px; text-align: center; margin-top: 15px;">
+            <h4 style="color: white; margin: 0px;">OLS Summary</h4>
+            <p style="color: white; margin: 0px;">
+            R-squared: {model_ols.rsquared:.3f}
+            </p>
+            <p style="color: white; margin: 0px;">
+            Intercept (p-value): {model_ols.params[0]:.3f} ({model_ols.pvalues[0]:.3f})
+            </p>
+            <p style="color: white; margin: 0px;">
+            Slope (p-value): {model_ols.params[1]:.3f} ({model_ols.pvalues[1]:.3f})
+            </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+            )

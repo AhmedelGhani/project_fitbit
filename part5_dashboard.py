@@ -514,7 +514,7 @@ elif selected == "Sleep Analysis":
     import statsmodels.api as sm
     import matplotlib.pyplot as plt
     from scripts.db_datawrangling import mergingtables, get_daily_sleep_minutes, get_hourly_active_minutes
-    from db_datavisualization import timeseries_plot
+    from scripts.db_datavisualization import timeseries_plot
     st.title("Sleep Duration Analysis")
 
     min_date, max_date = activity["ActivityDate"].min(), activity["ActivityDate"].max()
