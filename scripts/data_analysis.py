@@ -93,7 +93,7 @@ def plot_distance_over_time(df):
 def plot_distance_vs_calories(activity):
     fig, ax = plt.subplots(figsize=(5, 3))
     ax.scatter(activity["TotalDistance"], activity["Calories"], alpha=0.6, color="#007b82")
-    ax.set_title("Distance vs Calories")
+    ax.set_title("Distance vs. Calories")
     ax.set_xlabel("Total Distance (km)")
     ax.set_ylabel("Calories Burned")
     ax.grid(True)

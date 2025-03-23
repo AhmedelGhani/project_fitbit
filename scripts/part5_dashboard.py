@@ -42,37 +42,37 @@ if selected == "Home":
     with col1:
         st.metric("Participants", num_participants)
     with col2:
-        st.metric("Avg Steps", f"{avg_steps:.0f}")
+        st.metric("Average Steps", f"{avg_steps:.0f}")
     with col3:
-        st.metric("Avg Calories", f"{avg_calories:.0f} kcal")
+        st.metric("Average Calories", f"{avg_calories:.0f} kcal")
     with col4:
-        st.metric("Avg Active Min", f"{avg_active:.1f} min")
+        st.metric("Average Active Min", f"{avg_active:.1f} min")
     with col5:
-        st.metric("Avg Sedentary Min", f"{avg_sedentary:.1f} min")
+        st.metric("Average Sedentary Min", f"{avg_sedentary:.1f} min")
 
     st.markdown("---")
-
-    st.subheader("Calories vs Total Steps Regression")
-    model = data_analysis.run_regression(activity)
-    r2 = model.rsquared
-    intercept = model.params[0]
-    coef = model.params[1]
-    pval_intercept = model.pvalues[0]
-    pval_slope = model.pvalues[1]
-
     colR1, colR2 = st.columns(2)
+    
     with colR1:
-        st.markdown(f"""
-        <div style='background-color:#002a3a; padding:15px; border-radius:10px; color:white;'>
-        <h4>OLS Regression Summary</h4>
-        <p><strong>R-squared:</strong> {r2:.3f}</p>
-        <p><strong>Intercept:</strong> {intercept:.2f} (p = {pval_intercept:.2e})</p>
-        <p><strong>TotalSteps Coef:</strong> {coef:.4f} (p = {pval_slope:.2e})</p>
-        </div>
-        """, unsafe_allow_html=True)
+         st.markdown("<h3 style='text-align: center;'>Calories vs. Total Steps Regression</h3>", unsafe_allow_html=True)
+         model = data_analysis.run_regression(activity)
+         r2 = model.rsquared
+         intercept = model.params[0]
+         coef = model.params[1]
+         pval_intercept = model.pvalues[0]
+         pval_slope = model.pvalues[1]
+
+         st.markdown(f"""
+         <div style='background-color:#002a3a; padding:15px; border-radius:10px; color:white;'>
+         <h4>OLS Regression Summary</h4>
+         <p><strong>R-squared:</strong> {r2:.3f}</p>
+         <p><strong>Intercept:</strong> {intercept:.2f} (p = {pval_intercept:.2e})</p>
+         <p><strong>TotalSteps Coef:</strong> {coef:.4f} (p = {pval_slope:.2e})</p>
+         </div>
+         """, unsafe_allow_html=True)
 
     with colR2:
-        st.subheader("Distance vs Calories Plot")
+        st.markdown("<h3 style='text-align: center;'>Distance vs. Calories Plot</h3>", unsafe_allow_html=True)
         fig_dist = data_analysis.plot_distance_vs_calories(activity)
         st.pyplot(fig_dist)
 
@@ -113,23 +113,23 @@ if selected == "Home":
     num_part = sleepDF['Id'].nunique()
     avgSleepBlock['AverageSleepMinutes'] = avgSleepBlock['TotalMinutes'] / num_part
 
-    st.subheader("Averages per 4h Block")
+    st.subheader("Averages per 4-Hour Block")
     fig_block, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(12, 3))
     ax1.bar(avgStepsBlock['Block'], avgStepsBlock['AverageSteps'], color='#00B5B8')
-    ax1.set_title("Avg Steps")
-    ax1.set_xlabel("4h Block")
+    ax1.set_title("Average Steps")
+    ax1.set_xlabel("4-Hour Block (Hours)")
     ax1.set_ylabel("Steps")
     ax1.tick_params(axis='x', labelrotation=45)
 
     ax2.bar(avgCaloriesBlock['Block'], avgCaloriesBlock['AverageCalories'], color='#00B5B8')
-    ax2.set_title("Avg Calories")
-    ax2.set_xlabel("4h Block")
-    ax2.set_ylabel("kcal")
+    ax2.set_title("Average Calories")
+    ax2.set_xlabel("-Hour Block (Hours)")
+    ax2.set_ylabel("Calories (kcal)")
     ax2.tick_params(axis='x', labelrotation=45)
 
     ax3.bar(avgSleepBlock['Block'], avgSleepBlock['AverageSleepMinutes'], color='#00B5B8')
-    ax3.set_title("Avg Sleep")
-    ax3.set_xlabel("4h Block")
+    ax3.set_title("Average Sleep Duration")
+    ax3.set_xlabel("4-Hour Block (Hours)")
     ax3.set_ylabel("Minutes")
     ax3.tick_params(axis='x', labelrotation=45)
 
@@ -149,21 +149,22 @@ if selected == "Home":
     classifications = counts.apply(classify)
     classification_counts = classifications.value_counts()
 
-    st.subheader("User Activity Classification")
+    st.markdown("<h3 style='text-align: center;'>User Activity Classification Pie Chart</h3>", unsafe_allow_html=True)
 
-    col_pie, _ = st.columns([1, 2])  # Control layout with padding
-    with col_pie:
-        fig_pie, ax_pie = plt.subplots(figsize=(2.5, 2.5))  # Smaller size
+    col1, col_center, col3 = st.columns([1, 2, 1])
+    with col_center:
+        fig_pie, ax_pie = plt.subplots(figsize=(3, 3))
         ax_pie.pie(
-            classification_counts,
-            labels=classification_counts.index,
-            autopct="%1.1f%%",
-            colors=['#00B5B8', '#66c2a5', '#3288bd'],
-            startangle=140,
-            textprops={'fontsize': 9}
-    )
-    ax_pie.set_title("User Activity Classification", fontsize=11)
-    st.pyplot(fig_pie)
+        classification_counts,
+        labels=classification_counts.index,
+        autopct="%1.1f%%",
+        colors=['#00B5B8', '#66c2a5', '#3288bd'],
+        startangle=140,
+        textprops={'fontsize': 7}
+     )
+        ax_pie.set_title("User Activity Classification", fontsize=11, pad=2)
+        plt.tight_layout(pad=0)
+        st.pyplot(fig_pie, use_container_width=True)
 
 
 
@@ -508,7 +509,9 @@ elif selected == "Sleep Analysis":
     import matplotlib.pyplot as plt
     from db_datawrangling import mergingtables, get_daily_sleep_minutes, get_hourly_active_minutes
     from db_datavisualization import timeseries_plot
+    
     st.title("Sleep Duration Analysis")
+    st.markdown("---")
 
     min_date, max_date = activity["ActivityDate"].min(), activity["ActivityDate"].max()
     selected_dates = st.sidebar.date_input("Filter by date range", value=(min_date, max_date),
@@ -576,6 +579,8 @@ elif selected == "Sleep Analysis":
         fig = timeseries_plot(final_data, selected_metric, "SleepMinutes")
         st.pyplot(fig)
 
+    st.markdown("---")
+
     st.markdown("### Correlation Analysis")
 
     if final_data.empty or selected_metric not in final_data.columns:
@@ -587,31 +592,35 @@ elif selected == "Sleep Analysis":
         if df_corr.empty:
             st.error("No valid data available for correlation analysis.")
         else:
-            fig_corr, ax_corr = plt.subplots(figsize=(8, 4))
-            ax_corr.scatter(df_corr[selected_metric], df_corr["SleepMinutes"], color='#002a3a', alpha=0.7)
-            X_ols = sm.add_constant(df_corr[selected_metric])
-            model_ols = sm.OLS(df_corr["SleepMinutes"], X_ols).fit()
-            df_corr["pred"] = model_ols.predict(X_ols)
-            ax_corr.plot(df_corr[selected_metric], df_corr["pred"], color='red', linewidth=2)
-            ax_corr.set_xlabel(selected_metric_label)
-            ax_corr.set_ylabel("Sleep Duration")
-            st.pyplot(fig_corr)
+            col_left, col_center, col_right = st.columns([0.5, 3, 0.5])
+            with col_center:
+                fig_corr, ax_corr = plt.subplots(figsize=(7, 4))
+                ax_corr.scatter(df_corr[selected_metric], df_corr["SleepMinutes"], color='#002a3a', alpha=0.7)
+                X_ols = sm.add_constant(df_corr[selected_metric])
+                model_ols = sm.OLS(df_corr["SleepMinutes"], X_ols).fit()
+                df_corr["pred"] = model_ols.predict(X_ols)
+                ax_corr.plot(df_corr[selected_metric], df_corr["pred"], color='red', linewidth=2)
+                ax_corr.set_xlabel(selected_metric_label, labelpad = 3)
+                ax_corr.set_ylabel("Sleep Duration", labelpad = 3)
+
+                plt.tight_layout(pad=0.5)
+                st.pyplot(fig_corr, use_container_width=False)
         
-            st.markdown(
-            f"""
-            <div style="background-color: #002a3a; border-radius: 10px; 
+                st.markdown(
+                f"""
+                <div style="background-color: #002a3a; border-radius: 10px; 
                 padding: 15px; text-align: center; margin-top: 15px;">
-            <h4 style="color: white; margin: 0px;">OLS Summary</h4>
-            <p style="color: white; margin: 0px;">
-            R-squared: {model_ols.rsquared:.3f}
-            </p>
-            <p style="color: white; margin: 0px;">
-            Intercept (p-value): {model_ols.params[0]:.3f} ({model_ols.pvalues[0]:.3f})
-            </p>
-            <p style="color: white; margin: 0px;">
-            Slope (p-value): {model_ols.params[1]:.3f} ({model_ols.pvalues[1]:.3f})
-            </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-            )
+                <h4 style="color: white; margin: 0px;">OLS Summary</h4>
+                <p style="color: white; margin: 0px;">
+                R-squared: {model_ols.rsquared:.3f}
+                </p>
+                <p style="color: white; margin: 0px;">
+                Intercept (p-value): {model_ols.params[0]:.3f} ({model_ols.pvalues[0]:.3f})
+                </p>
+                <p style="color: white; margin: 0px;">
+                Slope (p-value): {model_ols.params[1]:.3f} ({model_ols.pvalues[1]:.3f})
+                </p>
+                </div>
+                """,
+                unsafe_allow_html=True
+                )
