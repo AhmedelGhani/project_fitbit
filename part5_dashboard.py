@@ -576,7 +576,6 @@ elif selected == "Sleep Analysis":
     selected_id = st.sidebar.selectbox("Choose an ID to view individual statistics", valid_ids)
 
     final_data = final_merged[final_merged["Id"] == selected_id]
-    st.markdown("### Correlation Analysis")
     if final_data.empty:
         st.error("No data can be displayed during the given dateframe, please extend your date length.")
     else:
@@ -584,12 +583,14 @@ elif selected == "Sleep Analysis":
         fig = timeseries_plot(final_data, selected_metric, "SleepMinutes")
         st.pyplot(fig)
 
-        if final_data.empty or selected_metric not in final_data.columns:
-            st.error("Insufficient data for correlation analysis.")
-        else:
-            final_data["SleepMinutes"] = final_data["SleepMinutes"].fillna(0)
-            df_corr = final_data[["SleepMinutes", selected_metric]].copy()
-            df_corr.dropna(subset=[selected_metric], inplace=True)
+    st.markdown("### Correlation Analysis")
+
+    if final_data.empty or selected_metric not in final_data.columns:
+        st.error("Insufficient data for correlation analysis.")
+    else:
+        final_data["SleepMinutes"] = final_data["SleepMinutes"].fillna(0)
+        df_corr = final_data[["SleepMinutes", selected_metric]].copy()
+        df_corr.dropna(subset=[selected_metric], inplace=True)
         if df_corr.empty:
             st.error("No valid data available for correlation analysis.")
         else:
