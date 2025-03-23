@@ -527,7 +527,7 @@ elif selected == "Sleep Analysis":
 
     st.sidebar.header("Select a Date Range")
     min_date, max_date = activity["ActivityDate"].min(), activity["ActivityDate"].max()
-    selected_dates = st.sidebar.date_input("Filter by date range", value=(min_date, max_date),
+    selected_dates = st.sidebar.date_input("Filter by date range:", value=(min_date, max_date),
         min_value=min_date, max_value=max_date)
 
     if isinstance(selected_dates, (tuple, list)):
@@ -549,7 +549,7 @@ elif selected == "Sleep Analysis":
     }
 
     selected_metric_label = st.sidebar.selectbox(
-    "Choose a metric to compare graphically against Sleep Duration.",
+    "Choose a metric to compare graphically against sleep duration/minutes:",
     options=list(metric_options.keys()),
     index=0  
     )
@@ -581,8 +581,8 @@ elif selected == "Sleep Analysis":
         if not subset.empty and subset["SleepMinutes"].sum() > 0:
             valid_ids.append(uid)
 
-    st.sidebar.header("Select Individual ID")
-    selected_id = st.sidebar.selectbox("Choose an ID to view individual statistics", valid_ids)
+    st.sidebar.header("Select an Individual ID")
+    selected_id = st.sidebar.selectbox("Choose an ID to view individual statistics:", valid_ids)
 
     final_data = final_merged[final_merged["Id"] == selected_id]
     if final_data.empty:
