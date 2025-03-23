@@ -1,11 +1,9 @@
 streamlit
 streamlit_option_menu
-sqlite3
-seaborn
 pandas
 matplotlib
-datetime
+seaborn
 statsmodels
 numpy
 scipy
-PIL
+Pillow
