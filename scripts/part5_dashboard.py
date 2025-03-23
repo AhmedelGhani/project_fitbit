@@ -515,7 +515,7 @@ if selected == "Individual Stats":
 
 elif selected == "Sleep Analysis":
     st.write("<style>h1 { text-align: center; }</style>", unsafe_allow_html=True)
-    
+
     import numpy as np
     import statsmodels.api as sm
     import matplotlib.pyplot as plt
@@ -525,6 +525,7 @@ elif selected == "Sleep Analysis":
     st.title("Sleep Duration Analysis")
     st.markdown("---")
 
+    st.sidebar.header("Select a Date Range")
     min_date, max_date = activity["ActivityDate"].min(), activity["ActivityDate"].max()
     selected_dates = st.sidebar.date_input("Filter by date range", value=(min_date, max_date),
         min_value=min_date, max_value=max_date)
@@ -537,7 +538,7 @@ elif selected == "Sleep Analysis":
     else:
         start_date = end_date = pd.to_datetime(selected_dates)
 
-    st.sidebar.header("Select A Metric")
+    st.sidebar.header("Select a Metric")
     metric_options = {
     "Total Steps": "TotalSteps",
     "Total Distance": "TotalDistance",
