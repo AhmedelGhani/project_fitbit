@@ -514,6 +514,8 @@ if selected == "Individual Stats":
 
 
 elif selected == "Sleep Analysis":
+    st.write("<style>h1 { text-align: center; }</style>", unsafe_allow_html=True)
+    
     import numpy as np
     import statsmodels.api as sm
     import matplotlib.pyplot as plt
