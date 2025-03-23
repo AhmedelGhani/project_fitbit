@@ -213,7 +213,7 @@ def timeseries_plot(df, col1, col2, ids = None, start_date=None, end_date=None, 
 
         lines, labels = ax.get_legend_handles_labels()
         lines2, labels2 = ax2.get_legend_handles_labels()
-        ax.legend(lines + lines2, labels + labels2, loc='lower center')
+        ax.legend(lines + lines2, labels + labels2, loc='upper right')
 
         start_str = df_uid['timestamp'].dt.date.min().strftime('%Y-%m-%d') if not df_uid.empty else ''
         end_str = df_uid['timestamp'].dt.date.max().strftime('%Y-%m-%d') if not df_uid.empty else ''
