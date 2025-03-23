@@ -30,8 +30,10 @@ activity["ActivityDate"] = pd.to_datetime(activity["ActivityDate"])
 
 if selected == "Home":
     st.write("<style>h1 { text-align: center; }</style>", unsafe_allow_html=True)
-    st.title("Fitbit Data Dashboard")
 
+    st.title("Fitbit Data Dashboard")
+    st.markdown("---")
+    
     num_participants = activity["Id"].nunique()
     avg_steps = activity["TotalSteps"].mean()
     avg_calories = activity["Calories"].mean()
@@ -294,6 +296,9 @@ if selected == "Individual Stats":
         individual_data["TotalIntensity"] = individual_data["TotalIntensity"].fillna(0)
 
     if not individual_data.empty:
+
+        st.markdown("---")
+
         st.markdown(
             f"**Statistics for ID:** `{selected_id}` "
             f"between **{start_date.date()}** and **{end_date.date()}**"
@@ -324,6 +329,7 @@ if selected == "Individual Stats":
                 unsafe_allow_html=True
             )
 
+        st.markdown("---")
         st.markdown("### Daily Histograms")
 
         if selected_metrics:
@@ -348,6 +354,8 @@ if selected == "Individual Stats":
 
             plt.tight_layout()
             st.pyplot(fig)
+
+        st.markdown("---")
 
         st.markdown("### Correlation Analysis")
         st.sidebar.header("Correlation Analysis")
@@ -403,6 +411,8 @@ if selected == "Individual Stats":
                         """,
                         unsafe_allow_html=True
                     )
+
+        st.markdown("---")
 
         st.markdown("### Weight Data")
         conn = sqlite3.connect('fitbit_database.db')
