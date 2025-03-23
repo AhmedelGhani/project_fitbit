@@ -74,7 +74,7 @@ pip install streamlit pandas matplotlib statsmodels Pillow streamlit-option-menu
 Navigate to the project directory and run:
 
 ```bash
-streamlit run part5_dashboard.py
+streamlit run scripts/part5_dashboard.py
 ```
 
 ### 3. Navigate the App
