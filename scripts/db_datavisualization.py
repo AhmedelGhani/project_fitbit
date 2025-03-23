@@ -1,5 +1,4 @@
 from db_datawrangling import mergingtables, get_daily_sleep_minutes, get_hourly_active_minutes
-import sqlite3
 from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
 import pandas as pd

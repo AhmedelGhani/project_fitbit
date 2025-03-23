@@ -1,0 +1,10 @@
+streamlit
+sqlite3
+seaborn
+pandas
+matplotlib
+datetime
+statsmodels
+numpy
+scipy
+PIL
