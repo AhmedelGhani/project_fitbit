@@ -543,7 +543,7 @@ elif selected == "Sleep Analysis":
         active_minutes = get_hourly_active_minutes()
         active_minutes.rename(columns={"Date": "ActivityHour", "ActiveMinutes": "TotalActiveMinutes"}, inplace=True)
         merged_metric = mergingtables("daily_activity", active_minutes, time_column1="ActivityDate", time_column2="ActivityHour")
-    elif selected_metric_label == "Intensity":
+    elif selected_metric_label == "Total Intensity":
         merged_metric = mergingtables("daily_activity", "hourly_intensity", time_column1="ActivityDate", time_column2="ActivityHour")
     else: 
         merged_metric = activity.copy() 

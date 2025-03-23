@@ -23,7 +23,11 @@ This Streamlit dashboard visualizes Fitbit activity data for a group of particip
 - Weight information and BMI health status when available.
 
 ### 🛌 Sleep Analysis
-- ....
+- Filter by user ID and select a custom date range
+- Compare sleep minutes/duration per day with another metric to produce 2 graphs, double y-axis graph and correlation scatter plot graph
+- Double y-axis graph displayed at the top, scaling the y-axis to see if sleep duration/minutes and other metric trend similarly/influence each other in timeframe
+- Correlation graph displayed with bubble at bottom stating R^2 value, slope and intercept
+- List of ID's available to be selected dynamically changes for different date and metric combinations
 
 ---
 
