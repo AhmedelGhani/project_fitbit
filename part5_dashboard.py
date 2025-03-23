@@ -602,9 +602,22 @@ else:
         ax_corr.set_xlabel(selected_metric_label)
         ax_corr.set_ylabel("Sleep Duration")
         st.pyplot(fig_corr)
+        
         st.markdown(
-            f"**Correlation Analysis:** "
-            f"R-squared: {model_ols.rsquared:.3f}, "
-            f"Slope: {model_ols.params[1]:.3f} "
-            f"(p-value: {model_ols.pvalues[1]:.3f})"
-        )
+    f"""
+    <div style="background-color: #002a3a; border-radius: 10px; 
+                padding: 15px; text-align: center; margin-top: 15px;">
+        <h4 style="color: white; margin: 0px;">OLS Summary</h4>
+        <p style="color: white; margin: 0px;">
+            R-squared: {model_ols.rsquared:.3f}
+        </p>
+        <p style="color: white; margin: 0px;">
+            Intercept (p-value): {model_ols.params[0]:.3f} ({model_ols.pvalues[0]:.3f})
+        </p>
+        <p style="color: white; margin: 0px;">
+            Slope (p-value): {model_ols.params[1]:.3f} ({model_ols.pvalues[1]:.3f})
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
